@@ -1,0 +1,55 @@
+{
+  "name": "Tab Counter",
+  "author": "DaAwesomeP",
+  "developer": {
+    "name": "DaAwesomeP",
+    "url": "https://daawesomep.github.io/"
+  },
+  "version": "0.0.1",
+  "description": "A button badge that shows the number of tabs open in a window",
+  "homepage_url": "https://github.com/DaAwesomeP/tab-counter",
+  "manifest_version": 2,
+   "applications": {
+    "gecko": {
+      "id": "tab-counter@daawesomep.addons.mozilla.org",
+      "strict_min_version": "52.0"
+    }
+  },
+  "icons": {
+    "32": "icons/tabcounter-32.png",
+    "38": "icons/tabcounter-38.png",
+    "64": "icons/tabcounter-64.png",
+    "96": "icons/tabcounter-96.png",
+    "128": "icons/tabcounter-128.png",
+    "256": "icons/tabcounter-256.png",
+    "1000": "icons/tabcounter.plain.min.svg"
+  },
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
+  "browser_action": {
+    "browser_style": true,
+    "default_icon": {
+      "32": "icons/tabcounter-32.png",
+      "38": "icons/tabcounter-38.png",
+      "64": "icons/tabcounter-64.png",
+      "96": "icons/tabcounter-96.png",
+      "128": "icons/tabcounter-128.png",
+      "256": "icons/tabcounter-256.png",
+      "1000": "icons/tabcounter.plain.min.svg"
+    },
+    "default_popup": "src/popup.html",
+    "default_title": "Tab Counter"
+  },
+  "options_ui": {
+    "page": "dist/options.html"
+  },
+  "background": {
+    "scripts": [
+      "lib/browser-polyfill.js",
+      "dist/background.js"
+    ],
+    "persistent": true
+  }
+}

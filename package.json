@@ -1,0 +1,19 @@
+{
+  "devDependencies": {
+    "babel-cli": "6.23.*",
+    "babel-preset-es2017": "6.22.*",
+    "babel-preset-es2016": "6.22.*"
+  },
+  "babel": {
+    "presets": [
+      "es2017",
+      "es2016"
+    ]
+  },
+  "scripts": {
+    "build": "babel src --out-dir dist --copy-files --source-maps",
+    "watch": "babel src --out-dir dist --copy-files --source-maps --watch"
+  },
+  "license" : "Apache-2.0",
+  "private": true
+}
