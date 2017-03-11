@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-async function start() {
+async function start () {
   let countWindow = (await browser.tabs.query({ currentWindow: true })).length
   let countAll = (await browser.tabs.query({})).length
   document.getElementById('countWindow').innerHTML = countWindow

@@ -19,7 +19,7 @@
  */
 
 var b = browser
-async function saveOptions(e) {
+async function saveOptions (e) {
   e.preventDefault()
   b.storage.sync.set({
     version: b.runtime.getManifest().version,
@@ -28,7 +28,7 @@ async function saveOptions(e) {
   })
 }
 
-async function restoreOptions() {
+async function restoreOptions () {
   let settings = await browser.storage.sync.get()
   if (settings.hasOwnProperty('version')) {
     if (settings.version !== browser.runtime.getManifest().version) {

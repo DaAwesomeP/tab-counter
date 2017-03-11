@@ -1,8 +1,14 @@
 {
   "devDependencies": {
-    "babel-cli": "6.23.*",
+    "babel-preset-es2016": "6.22.*",
     "babel-preset-es2017": "6.22.*",
-    "babel-preset-es2016": "6.22.*"
+    "del": "2.2.*",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-babel": "6.1.*",
+    "gulp-line-ending-corrector": "1.0.*",
+    "gulp-sourcemaps": "2.4.*",
+    "gulp-standard": "9.0.*",
+    "gulp-zip": "4.0.*"
   },
   "babel": {
     "presets": [
@@ -10,10 +16,18 @@
       "es2016"
     ]
   },
-  "scripts": {
-    "build": "babel src --out-dir dist --copy-files --source-maps",
-    "watch": "babel src --out-dir dist --copy-files --source-maps --watch"
+  "standard": {
+    "globals": [ "browser" ]
   },
-  "license" : "Apache-2.0",
+  "scripts": {
+    "gulp": "node ./node_modules/gulp/bin/gulp.js",
+    "build": "node ./node_modules/gulp/bin/gulp.js build",
+    "dist": "node ./node_modules/gulp/bin/gulp.js dist",
+    "check": "node ./node_modules/gulp/bin/gulp.js check",
+    "clean": "node ./node_modules/gulp/bin/gulp.js clean",
+    "pack": "node ./node_modules/gulp/bin/gulp.js pack",
+    "watch": "node ./node_modules/gulp/bin/gulp.js watch"
+  },
+  "license": "Apache-2.0",
   "private": true
 }

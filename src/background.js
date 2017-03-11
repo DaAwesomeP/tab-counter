@@ -18,31 +18,30 @@
  * limitations under the License.
  */
 
-async function updateIcon() {
+async function updateIcon () {
   let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
   let currentWindow = (await browser.tabs.query({ currentWindow: true }))
   browser.browserAction.setBadgeText({
     text: currentWindow.length.toString(),
     tabId: currentTab.id
-  }).catch(err => {console.log(err)})
+  }).catch(err => { console.log(err) })
   setTimeout(cycleUpdate, 100) // Will be error if tab has been removed
   setTimeout(cycleUpdate, 60)  // (onActivated fires slightly before onRemoved,
   setTimeout(cycleUpdate, 30)  //  but tab is gone during onActivated)
 }
-async function cycleUpdate() {
+async function cycleUpdate () {
   let currentWindow = (await browser.tabs.query({ currentWindow: true }))
   for (let tab of currentWindow) { // Workaround to prevent stuttering between windows
     browser.browserAction.setBadgeText({
       text: currentWindow.length.toString(),
       tabId: tab.id
-    }).catch(err => {console.log(err)}) // Catch if tab is gone
+    }).catch(err => { console.debug('Caught dead tab', err) }) // Catch if tab is gone
   }
 }
 
 checkSettings()
 updateIcon()
 
-//browser.browserAction.onClicked.addListener(updateIcon)
 browser.tabs.onActivated.addListener(updateIcon)
 browser.tabs.onAttached.addListener(updateIcon)
 browser.tabs.onCreated.addListener(updateIcon)
@@ -52,7 +51,7 @@ browser.tabs.onReplaced.addListener(updateIcon)
 browser.tabs.onRemoved.addListener(updateIcon)
 browser.windows.onFocusChanged.addListener(updateIcon)
 
-async function checkSettings() {
+async function checkSettings () {
   let settings = await browser.storage.sync.get()
   if (settings.hasOwnProperty('version')) {
     if (settings.version !== browser.runtime.getManifest().version) {
@@ -66,4 +65,4 @@ async function checkSettings() {
   if (settings.hasOwnProperty('badgeColor')) browser.browserAction.setIcon({path: `icons/${settings.icon}`})
   else browser.browserAction.setIcon({path: 'icons/tabcounter.plain.min.svg'})
 }
-browser.storage.onChanged.addListener(checkSettings);
+browser.storage.onChanged.addListener(checkSettings)
