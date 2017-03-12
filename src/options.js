@@ -19,8 +19,7 @@
  */
 
 var b = browser
-async function saveOptions (e) {
-  e.preventDefault()
+async function saveOptions () {
   b.storage.sync.set({
     version: b.runtime.getManifest().version,
     badgeColor: document.querySelector('#badgeColor').value,
