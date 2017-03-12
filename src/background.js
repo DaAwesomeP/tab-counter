@@ -61,7 +61,7 @@ async function checkSettings () {
     // New
   }
   if (settings.hasOwnProperty('badgeColor')) browser.browserAction.setBadgeBackgroundColor({color: settings.badgeColor})
-  else browser.browserAction.setBadgeBackgroundColor({color: 'black'})
+  else browser.browserAction.setBadgeBackgroundColor({color: '#000000'})
   if (settings.hasOwnProperty('badgeColor')) browser.browserAction.setIcon({path: `icons/${settings.icon}`})
   else browser.browserAction.setIcon({path: 'icons/tabcounter.plain.min.svg'})
 }

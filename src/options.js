@@ -38,7 +38,7 @@ async function restoreOptions () {
     // New
     await saveOptions() // save version
   }
-  document.querySelector('#badgeColor').value = settings.badgeColor || 'black'
+  document.querySelector('#badgeColor').value = settings.badgeColor || '#000000'
   document.querySelector('#icon').value = settings.icon || 'tabcounter.plain.min.svg'
 }
 
