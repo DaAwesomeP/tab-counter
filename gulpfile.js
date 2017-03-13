@@ -22,6 +22,7 @@ const gulp = require('gulp')
 const del = require('del')
 const lec = require('gulp-line-ending-corrector')
 const babel = require('gulp-babel')
+const rename = require('gulp-rename')
 const standard = require('gulp-standard')
 const sourcemaps = require('gulp-sourcemaps')
 const zip = require('gulp-zip')
@@ -63,11 +64,25 @@ gulp.task('compile', gulp.parallel(() => {
     .pipe(gulp.dest('dist'))
 }))
 
-gulp.task('pack', () => {
-  return gulp.src(['dist/**/*', 'lib/**/*', 'icons/**/*', '!icons/**/*.svg', 'icons/**/*.min.svg', 'manifest.json', 'LICENSE'], { base: '.' })
-    .pipe(zip('tab-counter.zip'))
+gulp.task('pack', gulp.parallel(() => {
+  return gulp.src(['dist/**/*', '!dist/**/*.map', 'lib/**/*', 'icons/**/*', '!icons/**/*.svg', 'icons/**/*.min.svg', 'manifest.firefox.json', 'LICENSE'], { base: '.' })
+    .pipe(rename(path => {
+      if (path.basename === 'manifest.firefox') {
+        path.basename = 'manifest'
+      }
+    }))
+    .pipe(zip('tab-counter.firefox.zip'))
     .pipe(gulp.dest('build'))
-})
+}, () => {
+  return gulp.src(['dist/**/*', '!dist/**/*.map', 'lib/**/*', 'icons/**/*', '!icons/**/*.svg', 'icons/**/*.min.svg', 'manifest.opera.json', 'LICENSE'], { base: '.' })
+    .pipe(rename(path => {
+      if (path.basename === 'manifest.opera') {
+        path.basename = 'manifest'
+      }
+    }))
+    .pipe(zip('tab-counter.opera.zip'))
+    .pipe(gulp.dest('build'))
+}))
 
 gulp.task('watch', gulp.series('checkSafe', 'compile', () => {
   return gulp.watch(['src/**/*', 'lib/**/*', 'icons/**/*', 'manifest.json', 'package.json'], gulp.parallel('checkSafe', 'compile'))

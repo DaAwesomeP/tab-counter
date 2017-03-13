@@ -24,7 +24,7 @@ async function updateIcon () {
   browser.browserAction.setBadgeText({
     text: currentWindow.length.toString(),
     tabId: currentTab.id
-  }).catch(err => { console.log(err) })
+  }).catch(err => { console.debug('Caught dead tab', err) })
   setTimeout(cycleUpdate, 100) // Will be error if tab has been removed
   setTimeout(cycleUpdate, 60)  // (onActivated fires slightly before onRemoved,
   setTimeout(cycleUpdate, 30)  //  but tab is gone during onActivated)
@@ -49,6 +49,7 @@ browser.tabs.onDetached.addListener(updateIcon)
 browser.tabs.onMoved.addListener(updateIcon)
 browser.tabs.onReplaced.addListener(updateIcon)
 browser.tabs.onRemoved.addListener(updateIcon)
+browser.tabs.onUpdated.addListener(updateIcon)
 browser.windows.onFocusChanged.addListener(updateIcon)
 
 async function checkSettings () {
