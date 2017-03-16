@@ -20,7 +20,7 @@
 
 var b = browser
 async function saveOptions () {
-  b.storage.sync.set({
+  b.storage.local.set({
     version: b.runtime.getManifest().version,
     badgeColor: document.querySelector('#badgeColor').value,
     icon: document.querySelector('#icon').value
@@ -28,7 +28,7 @@ async function saveOptions () {
 }
 
 async function restoreOptions () {
-  let settings = await browser.storage.sync.get()
+  let settings = await browser.storage.local.get()
   if (settings.hasOwnProperty('version')) {
     if (settings.version !== browser.runtime.getManifest().version) {
       // Upgrade

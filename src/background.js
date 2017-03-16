@@ -53,7 +53,7 @@ browser.tabs.onUpdated.addListener(updateIcon)
 browser.windows.onFocusChanged.addListener(updateIcon)
 
 async function checkSettings () {
-  let settings = await browser.storage.sync.get()
+  let settings = await browser.storage.local.get()
   if (settings.hasOwnProperty('version')) {
     if (settings.version !== browser.runtime.getManifest().version) {
       // Upgrade
