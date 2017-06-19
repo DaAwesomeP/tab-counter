@@ -18,28 +18,43 @@
  * limitations under the License.
  */
 
-async function updateIcon () {
-  let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
-  let currentWindow = (await browser.tabs.query({ currentWindow: true }))
-  browser.browserAction.setBadgeText({
-    text: currentWindow.length.toString(),
-    tabId: currentTab.id
-  }).catch(err => { console.debug('Caught dead tab', err) })
-  setTimeout(cycleUpdate, 100) // Will be error if tab has been removed
-  setTimeout(cycleUpdate, 60)  // (onActivated fires slightly before onRemoved,
-  setTimeout(cycleUpdate, 30)  //  but tab is gone during onActivated)
-}
-async function cycleUpdate () {
-  let currentWindow = (await browser.tabs.query({ currentWindow: true }))
-  for (let tab of currentWindow) { // Workaround to prevent stuttering between windows
+const updateIcon = debounce(async function () {
+  const windows = (await browser.windows.getAll())
+  for (const currentWindow of windows) {
+    const tabsOfCurrentWindow = (await browser.tabs.query({ windowId: currentWindow.id }))
+    const currentTab = (await browser.tabs.query({ windowId: currentWindow.id, active: true }))[0]
     browser.browserAction.setBadgeText({
-      text: currentWindow.length.toString(),
-      tabId: tab.id
-    }).catch(err => { console.debug('Caught dead tab', err) }) // Catch if tab is gone
+      text: tabsOfCurrentWindow.length.toString(),
+      tabId: currentTab.id
+    })
+  }
+}, 200)
+
+// debounce from underscore.js
+// details at https://davidwalsh.name/javascript-debounce-function
+function debounce (func, wait, immediate) {
+  let timeout
+  return function () {
+    const context = this
+    const args = arguments
+    const later = function () {
+      timeout = null
+      if (!immediate) func.apply(context, args)
+    }
+    const callNow = immediate && !timeout
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+    if (callNow) func.apply(context, args)
   }
 }
 
 checkSettings()
+
+// initalize empty badge
+browser.browserAction.setBadgeText({
+  text: ' '
+})
+
 updateIcon()
 
 browser.tabs.onActivated.addListener(updateIcon)
