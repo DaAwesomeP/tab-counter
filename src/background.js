@@ -19,9 +19,9 @@
  */
 
 const updateIcon = debounce(async function () {
-  const windows = (await browser.windows.getAll())
+  const windows = await browser.windows.getAll()
   for (const currentWindow of windows) {
-    const tabsOfCurrentWindow = (await browser.tabs.query({ windowId: currentWindow.id }))
+    const tabsOfCurrentWindow = await browser.tabs.query({ windowId: currentWindow.id })
     const currentTab = (await browser.tabs.query({ windowId: currentWindow.id, active: true }))[0]
     browser.browserAction.setBadgeText({
       text: tabsOfCurrentWindow.length.toString(),
