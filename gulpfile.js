@@ -65,7 +65,7 @@ gulp.task('compile', gulp.parallel(() => {
 }))
 
 gulp.task('pack', gulp.parallel(() => {
-  return gulp.src(['dist/**/*', '!dist/**/*.map', 'lib/**/*', 'icons/**/*', '!icons/**/*.svg', 'icons/**/*.min.svg', 'manifest.firefox.json', 'LICENSE'], { base: '.' })
+  return gulp.src(['dist/**/*', '!dist/**/*.map', 'icons/**/*', '!icons/**/*.svg', 'icons/**/*.min.svg', 'manifest.firefox.json', 'LICENSE'], { base: '.' })
     .pipe(rename(path => {
       if (path.basename === 'manifest.firefox') {
         path.basename = 'manifest'
@@ -74,7 +74,7 @@ gulp.task('pack', gulp.parallel(() => {
     .pipe(zip('tab-counter.firefox.zip'))
     .pipe(gulp.dest('build'))
 }, () => {
-  return gulp.src(['dist/**/*', '!dist/**/*.map', 'lib/**/*', 'icons/**/*', '!icons/**/*.svg', 'icons/**/*.min.svg', 'manifest.opera.json', 'LICENSE'], { base: '.' })
+  return gulp.src(['dist/**/*', '!dist/**/*.map', 'node_modules/webextension-polyfill/**/*', 'icons/**/*', '!icons/**/*.svg', 'icons/**/*.min.svg', 'manifest.opera.json', 'LICENSE'], { base: '.' })
     .pipe(rename(path => {
       if (path.basename === 'manifest.opera') {
         path.basename = 'manifest'
@@ -85,7 +85,7 @@ gulp.task('pack', gulp.parallel(() => {
 }))
 
 gulp.task('watch', gulp.series('checkSafe', 'compile', () => {
-  return gulp.watch(['src/**/*', 'lib/**/*', 'icons/**/*', 'manifest.json', 'package.json'], gulp.parallel('checkSafe', 'compile'))
+  return gulp.watch(['src/**/*', 'node_modules/webextension-polyfill/**/*', 'icons/**/*', 'manifest.json', 'package.json'], gulp.parallel('checkSafe', 'compile'))
 }))
 
 gulp.task('dist', gulp.series('static', 'check', 'clean', 'compile'))
