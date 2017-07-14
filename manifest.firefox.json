@@ -20,7 +20,6 @@
     "1": "icons/tabcounter.plain.min.svg"
   },
   "permissions": [
-    "tabs",
     "storage"
   ],
   "browser_action": {
