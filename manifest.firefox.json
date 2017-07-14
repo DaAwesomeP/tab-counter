@@ -25,6 +25,7 @@
   ],
   "browser_action": {
     "browser_style": true,
+    "default_area": "tabstrip",
     "default_icon": "icons/tabcounter.plain.min.svg",
     "default_popup": "dist/popup.html",
     "default_title": "Tab Counter"
