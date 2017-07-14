@@ -23,7 +23,8 @@ async function saveOptions () {
   b.storage.local.set({
     version: b.runtime.getManifest().version,
     badgeColor: document.querySelector('#badgeColor').value,
-    icon: document.querySelector('#icon').value
+    icon: document.querySelector('#icon').value,
+    counter: parseInt(document.querySelector('#counter').value)
   })
 }
 
@@ -40,6 +41,7 @@ async function restoreOptions () {
   }
   document.querySelector('#badgeColor').value = settings.badgeColor || '#000000'
   document.querySelector('#icon').value = settings.icon || 'tabcounter.plain.min.svg'
+  document.querySelector('#counter').value = settings.counter || 0
 }
 
 document.addEventListener('DOMContentLoaded', restoreOptions)

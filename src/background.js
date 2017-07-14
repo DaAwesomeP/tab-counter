@@ -18,42 +18,67 @@
  * limitations under the License.
  */
 
-async function updateIcon () {
+const updateIcon = async function updateIcon () {
+  // Get tab counter setting
+  let settings = await browser.storage.local.get()
+  let counterPreference = settings.counter || 0
+
+  // Get current tab to update badge in
   let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
-  let currentWindow = (await browser.tabs.query({ currentWindow: true }))
-  browser.browserAction.setBadgeText({
-    text: currentWindow.length.toString(),
-    tabId: currentTab.id
-  }).catch(err => { console.debug('Caught dead tab', err) })
-  setTimeout(cycleUpdate, 100) // Will be error if tab has been removed
-  setTimeout(cycleUpdate, 60)  // (onActivated fires slightly before onRemoved,
-  setTimeout(cycleUpdate, 30)  //  but tab is gone during onActivated)
-}
-async function cycleUpdate () {
-  let currentWindow = (await browser.tabs.query({ currentWindow: true }))
-  for (let tab of currentWindow) { // Workaround to prevent stuttering between windows
+
+  if (counterPreference === 0) { // Badge shows current window
+    // Get tabs in current window
+    let currentWindow = await browser.tabs.query({ currentWindow: true })
     browser.browserAction.setBadgeText({
-      text: currentWindow.length.toString(),
-      tabId: tab.id
-    }).catch(err => { console.debug('Caught dead tab', err) }) // Catch if tab is gone
+      text: (await currentWindow).length.toString(),
+      tabId: currentTab.id
+    }).catch(err => { console.debug('Caught dead tab', err) })
+  } else if (counterPreference === 1) { // Badge shows total of all windows
+    // Get tabs in all windows
+    let countAll = await browser.tabs.query({})
+    browser.browserAction.setBadgeText({
+      text: (await countAll).length.toString(),
+      tabId: currentTab.id
+    }).catch(err => { console.debug('Caught dead tab', err) })
+  } else if (counterPreference === 2) { // Badge shows both (Firefox limits to about 4 characters based on width)
+    // Get both tabs in current window and in all windows
+    let currentWindow = await browser.tabs.query({ currentWindow: true })
+    let countAll = await browser.tabs.query({})
+    browser.browserAction.setBadgeText({
+      text: `${(await currentWindow).length}/${(await countAll).length}`,
+      tabId: currentTab.id
+    }).catch(err => { console.debug('Caught dead tab', err) })
   }
 }
 
-checkSettings()
-updateIcon()
+const update = async function update () {
+  updateIcon()
+  setTimeout(updateIcon, 100) // Will be error if tab has been removed;
+  setTimeout(updateIcon, 60)  // onActivated fires slightly before onRemoved,
+  setTimeout(updateIcon, 30)  // but tab is gone during onActivated
+}
 
-browser.tabs.onActivated.addListener(updateIcon)
-browser.tabs.onAttached.addListener(updateIcon)
-browser.tabs.onCreated.addListener(updateIcon)
-browser.tabs.onDetached.addListener(updateIcon)
-browser.tabs.onMoved.addListener(updateIcon)
-browser.tabs.onReplaced.addListener(updateIcon)
-browser.tabs.onRemoved.addListener(updateIcon)
-browser.tabs.onUpdated.addListener(updateIcon)
-browser.windows.onFocusChanged.addListener(updateIcon)
+// Init empty badge for when addon starts and not yet loaded tabs
+browser.browserAction.setBadgeText({text: '   '})
+browser.browserAction.setBadgeBackgroundColor({color: '#000000'})
 
-async function checkSettings () {
+// Watch for tab and window events
+browser.tabs.onActivated.addListener(update)
+browser.tabs.onAttached.addListener(update)
+browser.tabs.onCreated.addListener(update)
+browser.tabs.onDetached.addListener(update)
+browser.tabs.onMoved.addListener(update)
+browser.tabs.onReplaced.addListener(update)
+browser.tabs.onRemoved.addListener(update)
+browser.tabs.onUpdated.addListener(update)
+browser.windows.onFocusChanged.addListener(update)
+
+// Load and apply icon and badge color settings
+const checkSettings = async function checkSettings () {
+  // Get settings object
   let settings = await browser.storage.local.get()
+
+  // Perform settings upgrade (placeholder, no breaking changes yet)
   if (settings.hasOwnProperty('version')) {
     if (settings.version !== browser.runtime.getManifest().version) {
       // Upgrade
@@ -61,9 +86,22 @@ async function checkSettings () {
   } else {
     // New
   }
+
+  // Apply badge color or use default
   if (settings.hasOwnProperty('badgeColor')) browser.browserAction.setBadgeBackgroundColor({color: settings.badgeColor})
   else browser.browserAction.setBadgeBackgroundColor({color: '#000000'})
-  if (settings.hasOwnProperty('badgeColor')) browser.browserAction.setIcon({path: `icons/${settings.icon}`})
+
+  // Apply icon selection or use default
+  if (settings.hasOwnProperty('icon')) browser.browserAction.setIcon({path: `icons/${settings.icon}`})
   else browser.browserAction.setIcon({path: 'icons/tabcounter.plain.min.svg'})
 }
-browser.storage.onChanged.addListener(checkSettings)
+
+// Load settings and update badge at app start
+const applyAll = async function applyAll () {
+  await checkSettings()  // Icon and badge color
+  await update()         // Badge text options
+}
+applyAll()
+
+// Listen for settings changes and update color, icon, and badge text instantly
+browser.storage.onChanged.addListener(applyAll)
