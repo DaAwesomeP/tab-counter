@@ -16,8 +16,7 @@
     "64": "icons/tabcounter-64.png",
     "96": "icons/tabcounter-96.png",
     "128": "icons/tabcounter-128.png",
-    "256": "icons/tabcounter-256.png",
-    "257": "icons/tabcounter.plain.min.svg"
+    "256": "icons/tabcounter-256.png"
   },
   "permissions": [
     "storage"
@@ -30,8 +29,7 @@
       "64": "icons/tabcounter-64.png",
       "96": "icons/tabcounter-96.png",
       "128": "icons/tabcounter-128.png",
-      "256": "icons/tabcounter-256.png",
-      "257": "icons/tabcounter.plain.min.svg"
+      "256": "icons/tabcounter-256.png"
     },
     "default_popup": "dist/popup.html",
     "default_title": "Tab Counter"
