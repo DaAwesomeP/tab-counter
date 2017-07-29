@@ -58,8 +58,9 @@ const lazyUpdateIcon = _.debounce(updateIcon, 250)
 
 // Will be error if tab has been removed, so wait 150ms;
 // onActivated fires slightly before onRemoved,
-// but tab is gone during onActivated
-const update = setTimeout(lazyUpdateIcon, 150)
+// but tab is gone during onActivated.
+// Must be a function to avoid event parameter errors
+const update = function update () { setTimeout(lazyUpdateIcon, 150) }
 
 // Init badge for when addon starts and not yet loaded tabs
 browser.browserAction.setBadgeText({text: 'wait'})
