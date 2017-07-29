@@ -18,6 +18,8 @@
  * limitations under the License.
  */
 
+/* global _ */
+
 const updateIcon = async function updateIcon () {
   // Get tab counter setting
   let settings = await browser.storage.local.get()
@@ -51,27 +53,30 @@ const updateIcon = async function updateIcon () {
   }
 }
 
-const update = async function update () {
-  updateIcon()
-  setTimeout(updateIcon, 100) // Will be error if tab has been removed;
-  setTimeout(updateIcon, 60)  // onActivated fires slightly before onRemoved,
-  setTimeout(updateIcon, 30)  // but tab is gone during onActivated
-}
+// Prevent from firing too frequently or flooding at a window or restore
+const lazyUpdateIcon = _.debounce(updateIcon, 250)
 
-// Init empty badge for when addon starts and not yet loaded tabs
-browser.browserAction.setBadgeText({text: '   '})
+// Will be error if tab has been removed, so wait 150ms;
+// onActivated fires slightly before onRemoved,
+// but tab is gone during onActivated
+const update = setTimeout(lazyUpdateIcon, 150)
+
+// Init badge for when addon starts and not yet loaded tabs
+browser.browserAction.setBadgeText({text: 'wait'})
 browser.browserAction.setBadgeBackgroundColor({color: '#000000'})
 
-// Watch for tab and window events
-browser.tabs.onActivated.addListener(update)
-browser.tabs.onAttached.addListener(update)
-browser.tabs.onCreated.addListener(update)
-browser.tabs.onDetached.addListener(update)
-browser.tabs.onMoved.addListener(update)
-browser.tabs.onReplaced.addListener(update)
-browser.tabs.onRemoved.addListener(update)
-browser.tabs.onUpdated.addListener(update)
-browser.windows.onFocusChanged.addListener(update)
+// Watch for tab and window events five seconds after browser startup
+setTimeout(() => {
+  browser.tabs.onActivated.addListener(update)
+  browser.tabs.onAttached.addListener(update)
+  browser.tabs.onCreated.addListener(update)
+  browser.tabs.onDetached.addListener(update)
+  browser.tabs.onMoved.addListener(update)
+  browser.tabs.onReplaced.addListener(update)
+  browser.tabs.onRemoved.addListener(update)
+  browser.tabs.onUpdated.addListener(update)
+  browser.windows.onFocusChanged.addListener(update)
+}, 5000)
 
 // Load and apply icon and badge color settings
 const checkSettings = async function checkSettings () {
@@ -101,7 +106,7 @@ const applyAll = async function applyAll () {
   await checkSettings()  // Icon and badge color
   await update()         // Badge text options
 }
-applyAll()
+checkSettings()
 
 // Listen for settings changes and update color, icon, and badge text instantly
 browser.storage.onChanged.addListener(applyAll)

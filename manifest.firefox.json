@@ -34,6 +34,7 @@
   },
   "background": {
     "scripts": [
+      "node_modules/underscore/underscore.js",
       "dist/background.js"
     ],
     "persistent": true

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "underscore": "^1.8.3",
     "webextension-polyfill": "^0.1.1"
   },
   "devDependencies": {
