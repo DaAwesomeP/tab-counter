@@ -24,4 +24,13 @@ async function start () {
   document.getElementById('countWindow').textContent = countWindow
   document.getElementById('countAll').textContent = countAll
 }
-start()
+
+if (typeof browser === 'undefined') {
+  var script = document.createElement('script')
+  script.addEventListener('load', () => {
+    start()
+  })
+  script.src = '../node_modules/webextension-polyfill/dist/browser-polyfill.js'
+  script.async = false
+  document.head.appendChild(script)
+} else start()

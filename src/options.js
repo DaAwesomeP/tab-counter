@@ -18,10 +18,13 @@
  * limitations under the License.
  */
 
-var b = browser
+var domReady = false
+var browserReady = false
+var restored = false
+
 async function saveOptions () {
-  b.storage.local.set({
-    version: b.runtime.getManifest().version,
+  browser.storage.local.set({
+    version: browser.runtime.getManifest().version,
     badgeColor: document.querySelector('#badgeColor').value,
     icon: document.querySelector('#icon').value,
     counter: parseInt(document.querySelector('#counter').value)
@@ -29,6 +32,7 @@ async function saveOptions () {
 }
 
 async function restoreOptions () {
+  restored = true
   let settings = await browser.storage.local.get()
   if (settings.hasOwnProperty('version')) {
     if (settings.version !== browser.runtime.getManifest().version) {
@@ -44,7 +48,25 @@ async function restoreOptions () {
   document.querySelector('#counter').value = settings.counter || 0
 }
 
-document.addEventListener('DOMContentLoaded', restoreOptions)
-for (let el of document.querySelectorAll('input, select')) {
-  el.addEventListener('change', saveOptions)
+function start () {
+  browserReady = true
+  if (domReady && !restored) restoreOptions()
+  for (let el of document.querySelectorAll('input, select')) {
+    el.addEventListener('change', saveOptions)
+  }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  domReady = true
+  if (browserReady && !restored) restoreOptions()
+})
+
+if (typeof browser === 'undefined') {
+  var script = document.createElement('script')
+  script.addEventListener('load', () => {
+    start()
+  })
+  script.src = '../node_modules/webextension-polyfill/dist/browser-polyfill.js'
+  script.async = false
+  document.head.appendChild(script)
+} else start()
