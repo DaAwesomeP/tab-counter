@@ -6,7 +6,7 @@
     "name": "DaAwesomeP",
     "url": "https://daawesomep.github.io/"
   },
-  "version": "0.1.1-alpha.1",
+  "version": "0.1.1.1",
   "description": "A button badge that shows the number of tabs open in a window",
   "homepage_url": "https://github.com/DaAwesomeP/tab-counter",
   "manifest_version": 2,
