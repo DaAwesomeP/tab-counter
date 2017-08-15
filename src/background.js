@@ -31,25 +31,31 @@ const updateIcon = async function updateIcon () {
   if (counterPreference === 0) { // Badge shows current window
     // Get tabs in current window
     let currentWindow = await browser.tabs.query({ currentWindow: true })
-    browser.browserAction.setBadgeText({
-      text: (await currentWindow).length.toString(),
-      tabId: currentTab.id
-    }).catch(err => { console.debug('Caught dead tab', err) })
+    if (typeof currentTab !== 'undefined') {
+      browser.browserAction.setBadgeText({
+        text: (await currentWindow).length.toString(),
+        tabId: currentTab.id
+      })
+    }
   } else if (counterPreference === 1) { // Badge shows total of all windows
     // Get tabs in all windows
     let countAll = await browser.tabs.query({})
-    browser.browserAction.setBadgeText({
-      text: (await countAll).length.toString(),
-      tabId: currentTab.id
-    }).catch(err => { console.debug('Caught dead tab', err) })
+    if (typeof currentTab !== 'undefined') {
+      browser.browserAction.setBadgeText({
+        text: (await countAll).length.toString(),
+        tabId: currentTab.id
+      })
+    }
   } else if (counterPreference === 2) { // Badge shows both (Firefox limits to about 4 characters based on width)
     // Get both tabs in current window and in all windows
     let currentWindow = await browser.tabs.query({ currentWindow: true })
     let countAll = await browser.tabs.query({})
-    browser.browserAction.setBadgeText({
-      text: `${(await currentWindow).length}/${(await countAll).length}`,
-      tabId: currentTab.id
-    }).catch(err => { console.debug('Caught dead tab', err) })
+    if (typeof currentTab !== 'undefined') {
+      browser.browserAction.setBadgeText({
+        text: `${(await currentWindow).length}/${(await countAll).length}`,
+        tabId: currentTab.id
+      })
+    }
   }
 }
 
