@@ -54,6 +54,9 @@ const updateIcon = async function updateIcon () {
 // Prevent from firing too frequently or flooding at a window or restore
 const lazyUpdateIcon = _.debounce(updateIcon, 250)
 
+// Prioritize active leading edge of every 1 second on tab switch (fluid update for new tabs)
+const lazyActivateUpdateIcon = _.debounce(updateIcon, 1000, { leading: true })
+
 // Will be error if tab has been removed, so wait 150ms;
 // onActivated fires slightly before onRemoved,
 // but tab is gone during onActivated.
@@ -66,7 +69,13 @@ browser.browserAction.setBadgeBackgroundColor({color: '#000000'})
 
 // Watch for tab and window events five seconds after browser startup
 setTimeout(() => {
-  browser.tabs.onActivated.addListener(update)
+  browser.tabs.onActivated.addListener(() => {
+    // Run normal update for most events
+    update()
+
+    // Prioritize active (fluid update for new tabs)
+    lazyActivateUpdateIcon()
+  })
   browser.tabs.onAttached.addListener(update)
   browser.tabs.onCreated.addListener(update)
   browser.tabs.onDetached.addListener(update)
