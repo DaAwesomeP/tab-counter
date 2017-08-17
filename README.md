@@ -1,4 +1,4 @@
-tab-counter
+tab-counter [![Travis](https://img.shields.io/travis/DaAwesomeP/tab-counter.svg?style=flat-square)](https://travis-ci.org/DaAwesomeP/tab-counter)
 ===========
 A button badge that shows the number of tabs open in a window. This addon was created as a WebExtension Replacement for [Michael Kraft's Tab Counter](https://addons.mozilla.org/en-US/firefox/addon/tab-counter/). Tested for Firefox and Opera.
 

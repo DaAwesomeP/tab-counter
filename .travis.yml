@@ -15,7 +15,7 @@ after_success:
  - sha256sum build/* > build/SHA256SUMS
  - ls -al --block-size=KB build
  - cat build/SHA256SUMS
-before_deploy: echo -n 'The checkums of the files in the Travis build should match those of the uploaded files for the release at https://github.com/DaAwesomeP/tab-counter/releases/tag/' > build/verifybuild.txt; echo $TRAVIS_TAG >> build/verifybuild.txt; cat build/verifybuild.txt
+before_deploy: echo -n 'The checkums of the files in the Travis build should match those of the uploaded files for the release at https://github.com/DaAwesomeP/tab-counter/releases/tag/' >> build/verifybuild.txt; echo $TRAVIS_TAG >> build/verifybuild.txt; cat build/verifybuild.txt
 deploy: 
   provider: releases
   api_key:
