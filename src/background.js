@@ -28,34 +28,26 @@ const updateIcon = async function updateIcon () {
   // Get current tab to update badge in
   let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
 
-  if (counterPreference === 0) { // Badge shows current window
-    // Get tabs in current window
-    let currentWindow = await browser.tabs.query({ currentWindow: true })
-    if (typeof currentTab !== 'undefined') {
-      browser.browserAction.setBadgeText({
-        text: (await currentWindow).length.toString(),
-        tabId: currentTab.id
-      })
-    }
-  } else if (counterPreference === 1) { // Badge shows total of all windows
-    // Get tabs in all windows
-    let countAll = await browser.tabs.query({})
-    if (typeof currentTab !== 'undefined') {
-      browser.browserAction.setBadgeText({
-        text: (await countAll).length.toString(),
-        tabId: currentTab.id
-      })
-    }
-  } else if (counterPreference === 2) { // Badge shows both (Firefox limits to about 4 characters based on width)
-    // Get both tabs in current window and in all windows
-    let currentWindow = await browser.tabs.query({ currentWindow: true })
-    let countAll = await browser.tabs.query({})
-    if (typeof currentTab !== 'undefined') {
-      browser.browserAction.setBadgeText({
-        text: `${(await currentWindow).length}/${(await countAll).length}`,
-        tabId: currentTab.id
-      })
-    }
+  // Get both tabs in current window and in all windows
+  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length.toString()
+  let countAll = (await browser.tabs.query({})).length.toString()
+  if (typeof currentTab !== 'undefined') {
+    let text
+    if (counterPreference === 0) text = currentWindow // Badge shows current window
+    else if (counterPreference === 1) text = countAll // Badge shows total of all windows
+    else if (counterPreference === 2) text = `${currentWindow}/${countAll}` // Badge shows both (Firefox limits to about 4 characters based on width)
+
+    // Update the badge
+    browser.browserAction.setBadgeText({
+      text: text,
+      tabId: currentTab.id
+    })
+
+    // Update the tooltip
+    browser.browserAction.setTitle({
+      title: `Tab Counter\nThis window:  ${currentWindow}\nAll windows: ${countAll}`,
+      tabId: currentTab.id
+    })
   }
 }
 
