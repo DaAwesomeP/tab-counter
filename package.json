@@ -12,7 +12,7 @@
     "gulp-line-ending-corrector": "1.0.*",
     "gulp-rename": "1.2.*",
     "gulp-sourcemaps": "2.4.*",
-    "gulp-standard": "9.0.*",
+    "gulp-standard": "10.1.*",
     "gulp-zip": "4.0.*"
   },
   "babel": {

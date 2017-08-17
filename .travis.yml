@@ -1,0 +1,28 @@
+sudo: false
+language: node_js
+node_js:
+- lts/*
+- node
+cache:
+  directories:
+  - node_modules
+before_install: npm i -g npm@5.1.0
+script: npm run build
+after_success:
+ - ls -al --block-size=KB build
+ - if [ -n "$TRAVIS_TAG" ]; then rename 's/tab-counter/tab-counter-'"$TRAVIS_TAG"'/' build/tab-counter*; else rename 's/tab-counter/tab-counter-'"$TRAVIS_BRANCH"'-'"$TRAVIS_COMMIT"'/' build/tab-counter*; fi
+ - touch build/verifybuild.txt; echo -n 'Check at the following URL to verify matching SHA256SUMS from the Travis build https://travis-ci.org/DaAwesomeP/tab-counter/jobs/' > build/verifybuild.txt; echo $TRAVIS_BUILD_ID >> build/verifybuild.txt; cat build/verifybuild.txt
+ - sha256sum build/* > build/SHA256SUMS
+ - ls -al --block-size=KB build
+ - cat build/SHA256SUMS
+before_deploy: echo -n 'The checkums of the files in the Travis build should match those of the uploaded files for the release at https://github.com/DaAwesomeP/tab-counter/releases/tag/' > build/verifybuild.txt; echo $TRAVIS_TAG >> build/verifybuild.txt; cat build/verifybuild.txt
+deploy: 
+  provider: releases
+  api_key:
+    secure: j2/HN9O57AeqgT9XYMnxPmHF+PfQWCtVrB/cGFZzEBB5dKYTghLUNn1p+ZCNueVRNoS2UbufRwKAxonQU0TtFsC1TbgwyC9an6b6gDmSwPyIlY1O5PmM2yq3csR5lqODe9rMcxufsCxm4dksLD26Yz/UOXngh9R1ow9yXJ/+ypo3djzjsmDc5avwHAXUJkvoIKPNkEK9Tb8BfVVC4YO7dgdBC3qE7oohokFsKuHNyLb2cdNm/ge/TKjz2n/EPMNtRRsAPc/KT5jPPao8ClK/4uiwS/9HaixYte9LwSa/Hg2KIoZSPjv/M9c6pSdvywQf5McfK6azr3s970NRRp82Lsz7WNImtCYC/ymUOjRpweoeXh70BvOTXfzBvSgcPpA1HF4s0UTVor212sxLkTAxHZ189w/e8XbgQBnmgE3jdQl72V1+EKZs9b4YzEvrrGLdooAcA1YHEMRj5bp8Vnn/tQFLvoKe+EyO4DFaxsFjBu0mpP+GIOughAX6LQ6bW0klqbFUaUXPciFaJrSAWgjPccZzk5yGKjaYC1rRdwTEW0NGYatP9kyAMi8MLP0vfdwq5NnluBHQv5vOFAu8QcSwLUysaS5Yn5v4FTZvVvCli1zUSqTLn62wIF+IIL3QfBPy3pKBOdwuZ9iGGdJ8QnXdvrZUh1XEzk/XCaNmpoZPE7Q=
+  file_glob: true
+  file: build/*
+  skip_cleanup: true
+  on:
+    repo: DaAwesomeP/tab-counter
+    tags: true
