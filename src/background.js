@@ -21,8 +21,22 @@
 /* global _ */
 
 const updateIcon = async function updateIcon () {
-  // Get tab counter setting
+  // Get and update settings
   let settings = await browser.storage.local.get()
+  if (settings.hasOwnProperty('version')) {
+    if (settings.version !== browser.runtime.getManifest().version) {
+      let versionSplit = settings.version.split('.').map((n) => parseInt(n))
+      // Upgrade
+
+      // since 0.3.0, icons now adapt to theme so reset icon setting
+      if (versionSplit[0] === 0 && versionSplit[1] < 3) settings.icon = 'tabcounter.plain.min.svg'
+    }
+  }
+  browser.storage.local.set(Object.assign(settings, {
+    version: browser.runtime.getManifest().version
+  }))
+
+  // Get tab counter setting
   let counterPreference = settings.counter || 0
 
   // Get current tab to update badge in

@@ -35,57 +35,20 @@
         <tr>
           <td>Badge color</td>
           <td><input type="color" name="badgeColor" id="badgeColor" /></td>
+          <td><em>Unfortuantely, the browser predetermines the text color and font size of the badge.</em></td>
         </tr>
         <tr>
-          <td>Icon</td>
+          <td>Icon Color &amp; Style</td>
           <td>
             <select name="icon" id="icon">
-              <optgroup label="Tab Counter Icon">
-                <option value="tabcounter.plain.min.svg">Tab Counter Vector (adjusts to DPI)</option>
-                <option value="tabcounter-15.png">Tab Counter 15px</option>
-                <option value="tabcounter-16.png">Tab Counter 16px</option>
-                <option value="tabcounter-17.png">Tab Counter 17px</option>
-                <option value="tabcounter-18.png">Tab Counter 18px</option>
-                <option value="tabcounter-19.png">Tab Counter 19px</option>
-                <option value="tabcounter-20.png">Tab Counter 20px</option>
-                <option value="tabcounter-21.png">Tab Counter 21px</option>
-                <option value="tabcounter-32.png">Tab Counter 32px</option>
-                <option value="tabcounter-38.png">Tab Counter 38px</option>
-                <option value="tabcounter-64.png">Tab Counter 64px</option>
-                <option value="tabcounter-96.png">Tab Counter 96px</option>
-                <option value="tabcounter-128.png">Tab Counter 128px</option>
-                <option value="tabcounter-256.png">Tab Counter 256px</option>
-              </optgroup>
-              <optgroup label="Clear Icon">
-                <option value="clear.plain.min.svg">Clear Vector (adjusts to DPI)</option>
-                <option value="clear-1.png">Clear 1px</option>
-                <option value="clear-2.png">Clear 2px</option>
-                <option value="clear-3.png">Clear 3px</option>
-                <option value="clear-4.png">Clear 4px</option>
-                <option value="clear-5.png">Clear 5px</option>
-                <option value="clear-6.png">Clear 6px</option>
-                <option value="clear-7.png">Clear 7px</option>
-                <option value="clear-8.png">Clear 8px</option>
-                <option value="clear-9.png">Clear 9px</option>
-                <option value="clear-10.png">Clear 10px</option>
-                <option value="clear-11.png">Clear 11px</option>
-                <option value="clear-12.png">Clear 12px</option>
-                <option value="clear-13.png">Clear 13px</option>
-                <option value="clear-14.png">Clear 14px</option>
-                <option value="clear-15.png">Clear 15px</option>
-                <option value="clear-16.png">Clear 16px</option>
-                <option value="clear-17.png">Clear 17px</option>
-                <option value="clear-18.png">Clear 18px</option>
-                <option value="clear-19.png">Clear 19px</option>
-                <option value="clear-20.png">Clear 20px</option>
-                <option value="clear-21.png">Clear 21px</option>
-                <option value="clear-32.png">Clear 32px</option>
-                <option value="clear-38.png">Clear 38px</option>
-                <option value="clear-64.png">Clear 64px</option>
-              </optgroup>
+              <option value="tabcounter.plain.min.svg">Tab Counter Default</option>
+              <option value="tabcounter-gray90.plain.min.svg">Tab Counter Gray 90 (Firefox Photon Design System Light Background Icon Color)</option>
+              <option value="tabcounter-gray10.plain.min.svg">Tab Counter Gray 10 (Firefox Photon Design System Dark Background Icon Color)</option>
+              <option value="tabcounter-black.plain.min.svg">Tab Counter Black</option>
+              <option value="tabcounter-white.plain.min.svg">Tab Counter White</option>
+              <option value="clear.plain.min.svg">Clear (shows badge only)</option>
             </select>
           </td>
-          <td><em>Vector icons are not supported in Chrome, but they somewhat work in Opera. The 256px icons do not work in Chrome nor Opera. The clear icons are only of use in Firefox. In Firefox, the ultra-small icon sizes allow for the badge to be centered in the toolbar. However, the small sizes often cause the badge to impede on the button to either side, so it is best to put the counter on of the end of a toolbar.</em></td>
         </tr>
         <tr>
           <td>Counter</td>
@@ -96,7 +59,7 @@
               <option value="2">Both</option>
             </select>
           </td>
-          <td><em>A maximum of four characters can be displayed on the badge.</em></td>
+          <td><em>A maximum of four characters can be displayed on the badge; this is a browser limitation.</em></td>
         </tr>
         <tr>
       </table>

@@ -17,7 +17,7 @@
     }
   },
   "icons": {
-    "1": "icons/tabcounter.plain.min.svg"
+    "1": "icons/tabcounter-logo.plain.min.svg"
   },
   "permissions": [
     "storage"
@@ -26,6 +26,11 @@
     "browser_style": true,
     "default_area": "tabstrip",
     "default_icon": "icons/tabcounter.plain.min.svg",
+    "theme_icons": [{
+      "dark": "icons/tabcounter-gray10.plain.min.svg",
+      "light": "icons/tabcounter-gray90.plain.min.svg",
+      "size": 1
+    }],
     "default_popup": "dist/popup.html",
     "default_title": "Tab Counter"
   },

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg3684"
+   version="1.1"
+   viewBox="0 0 33.866667 33.866668"
+   height="128"
+   width="128">
+  <defs
+     id="defs3678" />
+  <metadata
+     id="metadata3681">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(0,-263.13333)"
+     id="layer1">
+    <path
+       id="rect9"
+       d="m -32.400391,269.41992 a 1.323049,1.323049 0 0 0 -1.072265,0.54688 l -4.845703,6.68359 -4.847657,6.68359 a 1.323049,1.323049 0 0 0 -0.251953,0.7754 v 17.82226 17.82227 a 1.323049,1.323049 0 0 0 1.324219,1.32226 H -5.9667969 30.162109 a 1.323049,1.323049 0 0 0 1.324219,-1.32226 v -18.07618 -18.07421 a 1.323049,1.323049 0 0 0 -1.3125,-1.32422 l -9.693359,-0.084 -8.966797,-0.0781 -3.5800782,-5.73047 -3.9667969,-6.34375 A 1.323049,1.323049 0 0 0 2.8457031,269.41992 H -14.777344 Z m 0.673829,2.64649 h 16.949218 16.8906252 l 3.5761719,5.72265 3.9648438,6.34571 a 1.323049,1.323049 0 0 0 1.1113281,0.62109 l 9.691406,0.0859 8.382813,0.0723 v 16.76367 16.75391 H -5.9667969 -40.771484 v -16.5 -17.39258 l 4.59375,-6.33594 z"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.64583349;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+    <text
+       id="text822"
+       y="280.06665"
+       x="16.552696"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.09768486px;line-height:4.02790976px;font-family:Lato;-inkscape-font-specification:Lato;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458335px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.26458335px;-inkscape-font-specification:Arial;font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
+         y="280.06665"
+         x="16.552696"
+         id="tspan820">#</tspan></text>
+  </g>
+</svg>

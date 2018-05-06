@@ -34,15 +34,6 @@ async function saveOptions () {
 async function restoreOptions () {
   restored = true
   let settings = await browser.storage.local.get()
-  if (settings.hasOwnProperty('version')) {
-    if (settings.version !== browser.runtime.getManifest().version) {
-      // Upgrade
-      await saveOptions() // update version
-    }
-  } else {
-    // New
-    await saveOptions() // save version
-  }
   document.querySelector('#badgeColor').value = settings.badgeColor || '#000000'
   document.querySelector('#icon').value = settings.icon || 'tabcounter.plain.min.svg'
   document.querySelector('#counter').value = settings.counter || 0
