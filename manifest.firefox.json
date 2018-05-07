@@ -6,7 +6,7 @@
     "name": "DaAwesomeP",
     "url": "https://addons.mozilla.org/en-US/firefox/user/DaAwesomeP/"
   },
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "A button badge that shows the number of tabs open in a window",
   "homepage_url": "https://github.com/DaAwesomeP/tab-counter",
   "manifest_version": 2,
