@@ -29,6 +29,7 @@ async function saveOptions () {
     icon: document.querySelector('#icon').value,
     counter: parseInt(document.querySelector('#counter').value)
   })
+  await browser.runtime.sendMessage({ updateSettings: true })
 }
 
 async function restoreOptions () {

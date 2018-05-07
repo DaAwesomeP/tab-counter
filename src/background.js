@@ -21,23 +21,14 @@
 /* global _ */
 
 const updateIcon = async function updateIcon () {
-  // Get and update settings
+  // Get settings
   let settings = await browser.storage.local.get()
-  if (settings.hasOwnProperty('version')) {
-    if (settings.version !== browser.runtime.getManifest().version) {
-      let versionSplit = settings.version.split('.').map((n) => parseInt(n))
-      // Upgrade
-
-      // since 0.3.0, icons now adapt to theme so reset icon setting
-      if (versionSplit[0] === 0 && versionSplit[1] < 3) settings.icon = 'tabcounter.plain.min.svg'
-    }
-  }
-  browser.storage.local.set(Object.assign(settings, {
-    version: browser.runtime.getManifest().version
-  }))
 
   // Get tab counter setting
   let counterPreference = settings.counter || 0
+
+  // Stop tab badge update if badge disabled
+  if (counterPreference === 3) return
 
   // Get current tab to update badge in
   let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
@@ -81,38 +72,34 @@ const update = function update () { setTimeout(lazyUpdateIcon, 150) }
 browser.browserAction.setBadgeText({text: 'wait'})
 browser.browserAction.setBadgeBackgroundColor({color: '#000000'})
 
-// Watch for tab and window events five seconds after browser startup
-setTimeout(() => {
-  browser.tabs.onActivated.addListener(() => {
-    // Run normal update for most events
-    update()
+// Handler for when current tab changes
+const tabOnActivatedHandler = function tabOnActivatedHandler () {
+  // Run normal update for most events
+  update()
 
-    // Prioritize active (fluid update for new tabs)
-    lazyActivateUpdateIcon()
-  })
-  browser.tabs.onAttached.addListener(update)
-  browser.tabs.onCreated.addListener(update)
-  browser.tabs.onDetached.addListener(update)
-  browser.tabs.onMoved.addListener(update)
-  browser.tabs.onReplaced.addListener(update)
-  browser.tabs.onRemoved.addListener(update)
-  browser.tabs.onUpdated.addListener(update)
-  browser.windows.onFocusChanged.addListener(update)
-}, 5000)
+  // Prioritize active (fluid update for new tabs)
+  lazyActivateUpdateIcon()
+}
 
 // Load and apply icon and badge color settings
-const checkSettings = async function checkSettings () {
+const checkSettings = async function checkSettings (settingsUpdate) {
+  console.log('checkSettings')
   // Get settings object
   let settings = await browser.storage.local.get()
 
-  // Perform settings upgrade (placeholder, no breaking changes yet)
+  // Perform settings upgrade
   if (settings.hasOwnProperty('version')) {
     if (settings.version !== browser.runtime.getManifest().version) {
+      let versionSplit = settings.version.split('.').map((n) => parseInt(n))
       // Upgrade
+
+      // since 0.3.0, icons now adapt to theme so reset icon setting
+      if (versionSplit[0] === 0 && versionSplit[1] < 3) settings.icon = 'tabcounter.plain.min.svg'
     }
-  } else {
-    // New
   }
+  browser.storage.local.set(Object.assign(settings, {
+    version: browser.runtime.getManifest().version
+  }))
 
   // Apply badge color or use default
   if (settings.hasOwnProperty('badgeColor')) browser.browserAction.setBadgeBackgroundColor({color: settings.badgeColor})
@@ -121,14 +108,72 @@ const checkSettings = async function checkSettings () {
   // Apply icon selection or use default
   if (settings.hasOwnProperty('icon')) browser.browserAction.setIcon({path: `icons/${settings.icon}`})
   else browser.browserAction.setIcon({path: 'icons/tabcounter.plain.min.svg'})
+
+  // Get counter preference
+  let counterPreference
+  if (!settings.hasOwnProperty('counter')) counterPreference = 0
+  else counterPreference = settings.counter
+
+  // Either add badge update events or don't if not set to
+  if (counterPreference !== 3) {
+    // Watch for tab and window events five seconds after browser startup
+    setTimeout(() => {
+      browser.tabs.onActivated.addListener(tabOnActivatedHandler)
+      browser.tabs.onAttached.addListener(update)
+      browser.tabs.onCreated.addListener(update)
+      browser.tabs.onDetached.addListener(update)
+      browser.tabs.onMoved.addListener(update)
+      browser.tabs.onReplaced.addListener(update)
+      browser.tabs.onRemoved.addListener(update)
+      browser.tabs.onUpdated.addListener(update)
+      browser.windows.onFocusChanged.addListener(update)
+    }, settingsUpdate ? 1 : 5000) // add listeners immeadietly if not browser startup
+  } else {
+    console.log('REMOVAL')
+    // remove the listeners that were added
+    browser.tabs.onActivated.removeListener(tabOnActivatedHandler)
+    browser.tabs.onAttached.removeListener(update)
+    browser.tabs.onCreated.removeListener(update)
+    browser.tabs.onDetached.removeListener(update)
+    browser.tabs.onMoved.removeListener(update)
+    browser.tabs.onReplaced.removeListener(update)
+    browser.tabs.onRemoved.removeListener(update)
+    browser.tabs.onUpdated.removeListener(update)
+    browser.windows.onFocusChanged.removeListener(update)
+
+    // hide the "wait" badge if set not to show a badge
+    browser.browserAction.setBadgeText({ text: '' })
+    browser.browserAction.setTitle({ title: 'Tab Counter' })
+
+    // check each tab that was overriden with a counter badge
+    let allTabs = await browser.tabs.query({})
+    allTabs.forEach((tab) => {
+      browser.browserAction.setBadgeText({
+        text: '',
+        tabId: tab.id
+      })
+      browser.browserAction.setTitle({
+        title: 'Tab Counter',
+        tabId: tab.id
+      })
+    })
+  }
 }
 
 // Load settings and update badge at app start
-const applyAll = async function applyAll () {
-  await checkSettings()  // Icon and badge color
+const applyAll = async function applyAll (settingsUpdate) {
+  await checkSettings(settingsUpdate)  // Icon and badge color
   await update()         // Badge text options
 }
-checkSettings()
+applyAll()
 
 // Listen for settings changes and update color, icon, and badge text instantly
-browser.storage.onChanged.addListener(applyAll)
+// Bug: this listener run nonstop
+// browser.storage.onChanged.addListener(applyAll)
+
+// Listen for internal addon messages
+const messageHandler = async function messageHandler (request, sender, sendResponse) {
+  // Check for a settings update
+  if (request.hasOwnProperty('updateSettings')) if (request.updateSettings) applyAll(true)
+}
+browser.runtime.onMessage.addListener(messageHandler)
