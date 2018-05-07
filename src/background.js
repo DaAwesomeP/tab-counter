@@ -83,7 +83,6 @@ const tabOnActivatedHandler = function tabOnActivatedHandler () {
 
 // Load and apply icon and badge color settings
 const checkSettings = async function checkSettings (settingsUpdate) {
-  console.log('checkSettings')
   // Get settings object
   let settings = await browser.storage.local.get()
 
@@ -129,7 +128,6 @@ const checkSettings = async function checkSettings (settingsUpdate) {
       browser.windows.onFocusChanged.addListener(update)
     }, settingsUpdate ? 1 : 5000) // add listeners immeadietly if not browser startup
   } else {
-    console.log('REMOVAL')
     // remove the listeners that were added
     browser.tabs.onActivated.removeListener(tabOnActivatedHandler)
     browser.tabs.onAttached.removeListener(update)
