@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "underscore": "^1.8.3",
-    "webextension-polyfill": "^0.1.1"
+    "underscore": "^1.9.0",
+    "webextension-polyfill": "^0.2.1"
   },
   "devDependencies": {
     "babel-preset-es2016": "6.22.*",
