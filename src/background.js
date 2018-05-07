@@ -40,7 +40,7 @@ const updateIcon = async function updateIcon () {
     let text
     if (counterPreference === 0) text = currentWindow // Badge shows current window
     else if (counterPreference === 1) text = countAll // Badge shows total of all windows
-    else if (counterPreference === 2) text = `${currentWindow}/${countAll}` // Badge shows both (Firefox limits to about 4 characters based on width)
+    // else if (counterPreference === 2) text = `${currentWindow}/${countAll}` // Badge shows both (Firefox limits to about 4 characters based on width) // disabled because useless with four-character browser limit
 
     // Update the badge
     browser.browserAction.setBadgeText({
@@ -92,8 +92,15 @@ const checkSettings = async function checkSettings (settingsUpdate) {
       let versionSplit = settings.version.split('.').map((n) => parseInt(n))
       // Upgrade
 
-      // since 0.3.0, icons now adapt to theme so reset icon setting
+      // since v0.3.0, icons now adapt to theme so reset icon setting
       if (versionSplit[0] === 0 && versionSplit[1] < 3) settings.icon = 'tabcounter.plain.min.svg'
+
+      // disable the "both" counter option in version v0.3.0 due to the four-character badge limit (renders the feature uselss)
+      if (versionSplit[0] === 0 && versionSplit[1] < 3) {
+        if (settings.hasOwnProperty('counter')) {
+          if (settings.counter === 2) settings.counter = 0
+        }
+      }
     }
   }
   browser.storage.local.set(Object.assign(settings, {
