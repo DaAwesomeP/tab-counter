@@ -1,12 +1,10 @@
 sudo: false
 language: node_js
 node_js:
-- lts/*
-- node
+ - 8
 cache:
   directories:
   - node_modules
-before_install: npm i -g npm@5.1.0
 script: npm run build
 after_success:
  - ls -al --block-size=KB build
