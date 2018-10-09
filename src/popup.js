@@ -19,10 +19,12 @@
  */
 
 async function start () {
-  let countWindow = (await browser.tabs.query({ currentWindow: true })).length
-  let countAll = (await browser.tabs.query({})).length
-  document.getElementById('countWindow').textContent = countWindow
-  document.getElementById('countAll').textContent = countAll
+  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length
+  let allTabs = (await browser.tabs.query({})).length
+  let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
+  document.getElementById('currentWindow').textContent = currentWindow
+  document.getElementById('allTabs').textContent = allTabs
+  document.getElementById('allWindows').textContent = allWindows
 }
 
 if (typeof browser === 'undefined') {
