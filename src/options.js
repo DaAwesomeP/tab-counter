@@ -22,7 +22,13 @@ var domReady = false
 var browserReady = false
 var restored = false
 
+async function checkBadgeColorManualSetting () {
+  let autoSelect = document.querySelector('#badgeTextColorAuto').checked
+  document.querySelector('#badgeTextColor').disabled = autoSelect
+}
+
 async function saveOptions () {
+  checkBadgeColorManualSetting()
   let settings = await browser.storage.local.get()
   for (let setting in settings) {
     if (setting !== 'version') {
@@ -50,6 +56,7 @@ async function restoreOptions () {
       el.parentElement.parentElement.style.display = 'block'
     }
   }
+  checkBadgeColorManualSetting()
 }
 
 function start () {

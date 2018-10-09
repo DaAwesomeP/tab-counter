@@ -27,6 +27,12 @@
       html {
         font-family: sans-serif;
       }
+      tr {
+        margin-bottom: 5px;
+      }
+      td {
+        min-width: 400px !important;
+      }
     </style>
   </head>
   <body>
@@ -40,10 +46,12 @@
         <tr style="display: none">
           <td>Automatically set Badge Color</td>
           <td><input type="checkbox" name="badgeTextColorAuto" id="badgeTextColorAuto" optionType="boolean" /></td>
+          <td><em>When checked, the text color is either white or black based on the highest constrast with the badge color. When unchecked, a manual color may be selected.</em></td>
         </tr>
         <tr style="display: none">
-          <td>Badge Text Color (if not auto)</td>
+          <td>Badge Text Color (if not automatic)</td>
           <td><input type="color" name="badgeTextColor" id="badgeTextColor" optionType="string" /></td>
+          <td><em>This option is ignored/disabled unless "Automatically set Badge Color" is unchecked.</em></td>
         </tr>
         <tr style="display: none">
           <td>Icon Color &amp; Style</td>
