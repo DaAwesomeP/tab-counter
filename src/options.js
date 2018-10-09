@@ -23,21 +23,33 @@ var browserReady = false
 var restored = false
 
 async function saveOptions () {
-  browser.storage.local.set({
-    version: browser.runtime.getManifest().version,
-    badgeColor: document.querySelector('#badgeColor').value,
-    icon: document.querySelector('#icon').value,
-    counter: parseInt(document.querySelector('#counter').value)
-  })
+  let settings = await browser.storage.local.get()
+  for (let setting in settings) {
+    if (setting !== 'version') {
+      let el = document.querySelector(`#${setting}`)
+      if (el.getAttribute('type') === 'checkbox') settings[setting] = el.checked
+      else settings[setting] = el.value
+      let optionType = el.getAttribute('optionType')
+      if (optionType === 'number' && typeof settings[setting] !== 'number') settings[setting] = parseInt(settings[setting])
+      else if (optionType === 'string' && typeof settings[setting] !== 'string') settings[setting] = settings[setting].toString()
+      else if (optionType === 'boolean' && typeof settings[setting] !== 'boolean') settings[setting] = (settings[setting].toLowerCase() === 'true')
+    }
+  }
+  browser.storage.local.set(settings)
   await browser.runtime.sendMessage({ updateSettings: true })
 }
 
 async function restoreOptions () {
   restored = true
   let settings = await browser.storage.local.get()
-  document.querySelector('#badgeColor').value = settings.badgeColor || '#000000'
-  document.querySelector('#icon').value = settings.icon || 'tabcounter.plain.min.svg'
-  document.querySelector('#counter').value = settings.counter || 0
+  for (let setting in settings) {
+    if (setting !== 'version') {
+      let el = document.querySelector(`#${setting}`)
+      if (el.getAttribute('type') === 'checkbox') el.checked = settings[setting]
+      else el.value = settings[setting]
+      el.parentElement.parentElement.style.display = 'block'
+    }
+  }
 }
 
 function start () {

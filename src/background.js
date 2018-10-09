@@ -88,22 +88,47 @@ const tabOnActivatedHandler = function tabOnActivatedHandler () {
 const checkSettings = async function checkSettings (settingsUpdate) {
   // Get settings object
   let settings = await browser.storage.local.get()
+  // Get the browser name and version
+  let browserInfo
+  if (browser.runtime.hasOwnProperty('getBrowserInfo')) browserInfo = await browser.runtime.getBrowserInfo()
+  else {
+    browserInfo = { // polyfill doesn't seem to support this method, but we're only concerned with FF at the moment
+      version: '0',
+      vendor: '',
+      name: ''
+    }
+  }
+  const browserVersionSplit = browserInfo.version.split('.').map((n) => parseInt(n))
+
+  // Set base defaults if new insall
+  if (!settings.hasOwnProperty('version')) {
+    settings = {
+      version: '0.0.0',
+      icon: 'tabcounter.plain.min.svg',
+      counter: 0,
+      badgeColor: '#999999'
+    }
+  }
 
   // Perform settings upgrade
-  if (settings.hasOwnProperty('version')) {
-    if (settings.version !== browser.runtime.getManifest().version) {
-      let versionSplit = settings.version.split('.').map((n) => parseInt(n))
-      // Upgrade
+  if (settings.version !== browser.runtime.getManifest().version) {
+    let versionSplit = settings.version.split('.').map((n) => parseInt(n))
+    // Upgrade
 
-      // since v0.3.0, icons now adapt to theme so reset icon setting
-      if (versionSplit[0] === 0 && versionSplit[1] < 3) settings.icon = 'tabcounter.plain.min.svg'
+    // since v0.3.0, icons now adapt to theme so reset icon setting
+    if (versionSplit[0] === 0 && versionSplit[1] < 3) settings.icon = 'tabcounter.plain.min.svg'
 
-      // disable the "both" counter option in version v0.3.0 due to the four-character badge limit (renders the feature uselss)
-      if (versionSplit[0] === 0 && versionSplit[1] < 3) {
-        if (settings.hasOwnProperty('counter')) {
-          if (settings.counter === 2) settings.counter = 0
-        }
+    // disable the "both" counter option in version v0.3.0 due to the four-character badge limit (renders the feature uselss)
+    if (versionSplit[0] === 0 && versionSplit[1] < 3) {
+      if (settings.hasOwnProperty('counter')) {
+        if (settings.counter === 2) settings.counter = 0
       }
+    }
+
+    // add badgeTextColor support if at least v0.4.0 and FF 63
+    if (versionSplit[0] === 0 && versionSplit[1] < 4 && browserInfo.vendor === 'Mozilla' && browserInfo.name === 'Firefox' && browserVersionSplit[0] >= 63) {
+      settings.badgeTextColorAuto = true
+      settings.badgeTextColor = '#000000'
     }
   }
   browser.storage.local.set(Object.assign(settings, {
@@ -113,6 +138,12 @@ const checkSettings = async function checkSettings (settingsUpdate) {
   // Apply badge color or use default
   if (settings.hasOwnProperty('badgeColor')) browser.browserAction.setBadgeBackgroundColor({ color: settings.badgeColor })
   else browser.browserAction.setBadgeBackgroundColor({ color: '#000000' })
+
+  // Apply badge text color or use default if not set or not supported
+  if (settings.hasOwnProperty('badgeTextColor')) {
+    if (settings.badgeTextColorAuto !== true) browser.browserAction.setBadgeTextColor({ color: settings.badgeTextColor })
+    else browser.browserAction.setBadgeTextColor({ color: null })
+  }
 
   // Apply icon selection or use default
   if (settings.hasOwnProperty('icon')) browser.browserAction.setIcon({ path: `icons/${settings.icon}` })

@@ -32,15 +32,23 @@
   <body>
     <form>
       <table>
-        <tr>
-          <td>Badge color</td>
-          <td><input type="color" name="badgeColor" id="badgeColor" /></td>
-          <td><em>Unfortuantely, the browser predetermines the text color and font size of the badge.</em></td>
+        <tr style="display: none">
+          <td>Badge Color</td>
+          <td><input type="color" name="badgeColor" id="badgeColor" optionType="string" /></td>
+          <td><em>Unfortuantely, the browser predetermines thefont size of the badge. Setting the badge text color is available in Firefox 63 and above.</em></td>
         </tr>
-        <tr>
+        <tr style="display: none">
+          <td>Automatically set Badge Color</td>
+          <td><input type="checkbox" name="badgeTextColorAuto" id="badgeTextColorAuto" optionType="boolean" /></td>
+        </tr>
+        <tr style="display: none">
+          <td>Badge Text Color (if not auto)</td>
+          <td><input type="color" name="badgeTextColor" id="badgeTextColor" optionType="string" /></td>
+        </tr>
+        <tr style="display: none">
           <td>Icon Color &amp; Style</td>
           <td>
-            <select name="icon" id="icon">
+            <select name="icon" id="icon" optionType="string" >
               <option value="tabcounter.plain.min.svg">Tab Counter Default</option>
               <option value="tabcounter-gray90.plain.min.svg">Tab Counter Gray 90 (Firefox Photon Design System Light Background Icon Color)</option>
               <option value="tabcounter-gray10.plain.min.svg">Tab Counter Gray 10 (Firefox Photon Design System Dark Background Icon Color)</option>
@@ -51,10 +59,10 @@
             </select>
           </td>
         </tr>
-        <tr>
+        <tr style="display: none">
           <td>Counter</td>
           <td>
-            <select name="counter" id="counter">
+            <select name="counter" id="counter" optionType="number">
               <option value="0">Number of Tabs in Current Window</option>
               <option value="1">Total Number of Tabs of All Windows</option>
 <!--              <option value="2">Both</option>--><!-- The four character browser limitation makes this option futile -->
