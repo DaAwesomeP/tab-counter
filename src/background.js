@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-/* global _ */
+import { debounce } from 'underscore'
 
 const updateIcon = async function updateIcon () {
   // Get settings
@@ -57,10 +57,10 @@ const updateIcon = async function updateIcon () {
 }
 
 // Prevent from firing too frequently or flooding at a window or restore
-const lazyUpdateIcon = _.debounce(updateIcon, 250)
+const lazyUpdateIcon = debounce(updateIcon, 250)
 
 // Prioritize active leading edge of every 1 second on tab switch (fluid update for new tabs)
-const lazyActivateUpdateIcon = _.debounce(updateIcon, 1000, { leading: true })
+const lazyActivateUpdateIcon = debounce(updateIcon, 1000, { leading: true })
 
 // Will be error if tab has been removed, so wait 150ms;
 // onActivated fires slightly before onRemoved,

@@ -1,30 +1,31 @@
 {
   "dependencies": {
-    "underscore": "^1.9.0",
-    "webextension-polyfill": "^0.2.1"
+    "underscore": "^1.9.1",
+    "webextension-polyfill": "^0.3.1"
   },
   "devDependencies": {
-    "babel-preset-es2016": "6.22.*",
-    "babel-preset-es2017": "6.22.*",
-    "del": "2.2.*",
-    "gulp": "github:gulpjs/gulp#4.0",
-    "gulp-babel": "6.1.*",
-    "gulp-line-ending-corrector": "1.0.*",
-    "gulp-rename": "1.2.*",
-    "gulp-sourcemaps": "2.4.*",
-    "gulp-standard": "10.1.*",
-    "gulp-zip": "4.0.*"
+    "@babel/core": "^7.1.2",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
+    "babelify": "^10.0.0",
+    "del": "^3.0.0",
+    "eslint": "^5.6.1",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "gulp": "^4.0.0",
+    "gulp-bro": "^1.0.3",
+    "gulp-cli": "^2.0.1",
+    "gulp-eslint": "^5.0.0",
+    "gulp-line-ending-corrector": "^1.0.3",
+    "gulp-rename": "1.4.*",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-zip": "4.2.*"
   },
-  "babel": {
-    "presets": [
-      "es2017",
-      "es2016"
-    ]
-  },
-  "standard": {
-    "globals": [
-      "browser"
-    ]
+  "engines": {
+    "node": "8.x"
   },
   "scripts": {
     "gulp": "node ./node_modules/gulp/bin/gulp.js",
@@ -34,6 +35,9 @@
     "clean": "node ./node_modules/gulp/bin/gulp.js clean",
     "pack": "node ./node_modules/gulp/bin/gulp.js pack",
     "watch": "node ./node_modules/gulp/bin/gulp.js watch"
+  },
+  "repository": {
+    "url": "https://github.com/DaAwesomeP/tab-counter"
   },
   "license": "Apache-2.0",
   "private": true

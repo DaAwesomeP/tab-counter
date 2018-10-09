@@ -21,24 +21,24 @@
 const gulp = require('gulp')
 const del = require('del')
 const lec = require('gulp-line-ending-corrector')
-const babel = require('gulp-babel')
+const bro = require('gulp-bro')
+const babelify = require('babelify')
+const eslint = require('gulp-eslint')
 const rename = require('gulp-rename')
-const standard = require('gulp-standard')
 const sourcemaps = require('gulp-sourcemaps')
 const zip = require('gulp-zip')
 
 gulp.task('check', () => {
   return gulp.src(['src/**/*.js', 'gulpfile.js'])
-    .pipe(standard())
-    .pipe(standard.reporter('default', {
-      breakOnError: true
-    }))
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError())
 })
 
 gulp.task('checkSafe', () => {
   return gulp.src(['src/**/*.js', 'gulpfile.js'])
-    .pipe(standard())
-    .pipe(standard.reporter('default', {}))
+    .pipe(eslint())
+    .pipe(eslint.format())
 })
 
 gulp.task('static', () => {
@@ -56,7 +56,11 @@ gulp.task('clean', (callback) => {
 gulp.task('compile', gulp.parallel(() => {
   return gulp.src('src/**/*.js')
     .pipe(sourcemaps.init())
-    .pipe(babel())
+    .pipe(bro({
+      transform: [
+        babelify.configure()
+      ]
+    }))
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest('dist'))
 }, () => {
