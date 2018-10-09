@@ -69,8 +69,8 @@ const lazyActivateUpdateIcon = _.debounce(updateIcon, 1000, { leading: true })
 const update = function update () { setTimeout(lazyUpdateIcon, 150) }
 
 // Init badge for when addon starts and not yet loaded tabs
-browser.browserAction.setBadgeText({text: 'wait'})
-browser.browserAction.setBadgeBackgroundColor({color: '#000000'})
+browser.browserAction.setBadgeText({ text: 'wait' })
+browser.browserAction.setBadgeBackgroundColor({ color: '#000000' })
 
 // Handler for when current tab changes
 const tabOnActivatedHandler = function tabOnActivatedHandler () {
@@ -108,12 +108,12 @@ const checkSettings = async function checkSettings (settingsUpdate) {
   }))
 
   // Apply badge color or use default
-  if (settings.hasOwnProperty('badgeColor')) browser.browserAction.setBadgeBackgroundColor({color: settings.badgeColor})
-  else browser.browserAction.setBadgeBackgroundColor({color: '#000000'})
+  if (settings.hasOwnProperty('badgeColor')) browser.browserAction.setBadgeBackgroundColor({ color: settings.badgeColor })
+  else browser.browserAction.setBadgeBackgroundColor({ color: '#000000' })
 
   // Apply icon selection or use default
-  if (settings.hasOwnProperty('icon')) browser.browserAction.setIcon({path: `icons/${settings.icon}`})
-  else browser.browserAction.setIcon({path: 'icons/tabcounter.plain.min.svg'})
+  if (settings.hasOwnProperty('icon')) browser.browserAction.setIcon({ path: `icons/${settings.icon}` })
+  else browser.browserAction.setIcon({ path: 'icons/tabcounter.plain.min.svg' })
 
   // Get counter preference
   let counterPreference
@@ -167,8 +167,8 @@ const checkSettings = async function checkSettings (settingsUpdate) {
 
 // Load settings and update badge at app start
 const applyAll = async function applyAll (settingsUpdate) {
-  await checkSettings(settingsUpdate)  // Icon and badge color
-  await update()         // Badge text options
+  await checkSettings(settingsUpdate) // Icon and badge color
+  await update() // Badge text options
 }
 applyAll()
 
