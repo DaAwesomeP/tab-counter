@@ -42,7 +42,7 @@ const updateIcon = async function updateIcon () {
     let text
     if (counterPreference === 0) text = currentWindow // Badge shows current window
     else if (counterPreference === 1) text = allTabs // Badge shows total of all windows
-    // else if (counterPreference === 2) text = `${currentWindow}/${countAll}` // Badge shows both (Firefox limits to about 4 characters based on width) // disabled because useless with four-character browser limit
+    else if (counterPreference === 2) text = `${currentWindow}/${allTabs}` // Badge shows both (Firefox limits to about 4 characters based on width)
     else if (counterPreference === 4) text = allWindows // Badge shows total of all windows
 
     // Update the badge
