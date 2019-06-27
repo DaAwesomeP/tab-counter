@@ -19,8 +19,8 @@
  */
 
 async function start () {
-  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length
-  let allTabs = (await browser.tabs.query({})).length
+  let currentWindow = (await browser.tabs.query({ hidden: false, currentWindow: true })).length
+  let allTabs = (await browser.tabs.query({ hidden: false })).length
   let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
   document.getElementById('currentWindow').textContent = currentWindow
   document.getElementById('allTabs').textContent = allTabs
