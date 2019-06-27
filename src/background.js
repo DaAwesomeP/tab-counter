@@ -189,15 +189,15 @@ const checkSettings = async function checkSettings (settingsUpdate) {
     browser.browserAction.setTitle({ title: 'Tab Counter' })
 
     // check each tab that was overriden with a counter badge
-    let allTabs = await browser.tabs.query({})
-    allTabs.forEach((tab) => {
+    let allWindows = await browser.windows.getAll()
+    allWindows.forEach((window) => {
       browser.browserAction.setBadgeText({
         text: '',
-        tabId: tab.id
+        windowId: window.id
       })
       browser.browserAction.setTitle({
         title: 'Tab Counter',
-        tabId: tab.id
+        windowId: window.id
       })
     })
   }
