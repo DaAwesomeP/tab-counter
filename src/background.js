@@ -30,31 +30,31 @@ const updateIcon = async function updateIcon () {
   // Stop tab badge update if badge disabled
   if (counterPreference === 3) return
 
-  // Get current tab to update badge in
-  let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
+  // Get current window to update badge in
+  let currentWindow = await browser.windows.getCurrent()
 
   // Get tabs in current window, tabs in all windows, and the number of windows
-  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length.toString()
+  let tabsInCurrentWindow = (await browser.tabs.query({ currentWindow: true })).length.toString()
   let allTabs = (await browser.tabs.query({})).length.toString()
   let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
 
-  if (typeof currentTab !== 'undefined') {
+  if (typeof currentWindow !== 'undefined') {
     let text
-    if (counterPreference === 0) text = currentWindow // Badge shows current window
+    if (counterPreference === 0) text = tabsInCurrentWindow // Badge shows current window
     else if (counterPreference === 1) text = allTabs // Badge shows total of all windows
-    else if (counterPreference === 2) text = `${currentWindow}/${allTabs}` // Badge shows both (Firefox limits to about 4 characters based on width)
+    else if (counterPreference === 2) text = `${tabsInCurrentWindow}/${allTabs}` // Badge shows both (Firefox limits to about 4 characters based on width)
     else if (counterPreference === 4) text = allWindows // Badge shows total of all windows
 
     // Update the badge
     browser.browserAction.setBadgeText({
       text: text,
-      tabId: currentTab.id
+      windowId: currentWindow.id
     })
 
     // Update the tooltip
     browser.browserAction.setTitle({
       title: `Tab Counter\nTabs in this window:  ${currentWindow}\nTabs in all windows: ${allTabs}\nNumber of windows: ${allWindows}`,
-      tabId: currentTab.id
+      windowId: currentWindow.id
     })
   }
 }
