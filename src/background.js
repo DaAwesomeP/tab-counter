@@ -34,8 +34,9 @@ const updateIcon = async function updateIcon () {
   let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
 
   // Get tabs in current window, tabs in all windows, and the number of windows
-  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length.toString()
-  let allTabs = (await browser.tabs.query({})).length.toString()
+  let currentWindow = (await browser.tabs.query({ currentWindow: true, hidden: false })).length.toString()
+  let allTabs = (await browser.tabs.query({ hidden: false })).length.toString()
+  if (settings.info.browserVersionSplit[0] >= 62) let hiddenTabs = (await browser.tabs.query({ hidden: true })).length.toString()
   let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
 
   if (typeof currentTab !== 'undefined') {
@@ -126,10 +127,13 @@ const checkSettings = async function checkSettings (settingsUpdate) {
     }
 
     // add badgeTextColor support if at least v0.4.0 and FF 63
-    if (versionSplit[0] === 0 && versionSplit[1] < 4 && browserInfo.vendor === 'Mozilla' && browserInfo.name === 'Firefox' && browserVersionSplit[0] >= 63) {
+    if ((versionSplit[0] >= 0 || (versionSplit[0] === 0 && versionSplit[1] >= 4)) && browserInfo.vendor === 'Mozilla' && browserInfo.name === 'Firefox' && browserVersionSplit[0] >= 63) {
       settings.badgeTextColorAuto = true
       settings.badgeTextColor = '#000000'
     }
+
+    // add info section if at least v1.0.0
+    if (versionSplit[0] >= 1) settings.info = { browserVersionSplit }
   }
   browser.storage.local.set(Object.assign(settings, {
     version: browser.runtime.getManifest().version
