@@ -2,7 +2,7 @@
 # This file tells Babel what to do
 # See https://github.com/browserslist/browserslist for more info
 
-Firefox >= 45
+Firefox >= 52
 Firefox ESR
 Opera >= 43
 Chrome >= 56
