@@ -37,31 +37,31 @@ function lint () {
 lint.description = 'Run eslint and fail on error'
 exports.lint = lint
 
-function lintSafe () {
+function lintInfo () {
   return gulp.src(['src/**/*.js', 'gulpfile.js'])
     .pipe(eslint())
     .pipe(eslint.format())
 }
-lintSafe.description = 'Run eslint'
-exports.lintSafe = lintSafe
+lintInfo.description = 'Run eslint'
+exports.lintInfo = lintInfo
 
-function trim () {
+function fixEOL () {
   return gulp.src('src/**/*.js')
     .pipe(lec())
     .pipe(gulp.dest('src'))
 }
-trim.description = 'Fix line endings'
-exports.trim = trim
+fixEOL.description = 'Fix line endings'
+exports.fixEOL = fixEOL
 
 function clean (callback) {
   del(['dist/*', 'build/*'])
-    .then(() => { callback() })
+    .then(() => callback())
 }
 clean.description = 'Remove build artifacts'
 exports.clean = clean
 
 let compile = gulp.parallel(
-  () => {
+  function compileJs () {
     return gulp.src('src/**/*.js')
       .pipe(sourcemaps.init())
       .pipe(bro({
@@ -72,7 +72,7 @@ let compile = gulp.parallel(
       .pipe(sourcemaps.write('.'))
       .pipe(gulp.dest('dist'))
   },
-  () => {
+  function compileOther () {
     return gulp.src(['src/**/*', '!src/**/*.js'])
       .pipe(gulp.dest('dist'))
   }
@@ -81,7 +81,7 @@ compile.description = 'Compile with babel into dist/'
 exports.compile = compile
 
 let pack = gulp.parallel(
-  () => {
+  function packFirefox () {
     return gulp.src(['dist/**/*', '!dist/**/*.map', 'node_modules/underscore/**/*', 'icons/**/clear-*.png', 'icons/**/*.min.svg', 'manifest.firefox.json', 'LICENSE'], { base: '.' })
       .pipe(rename(path => {
         if (path.basename === 'manifest.firefox') {
@@ -91,7 +91,7 @@ let pack = gulp.parallel(
       .pipe(zip('tab-counter.firefox.zip'))
       .pipe(gulp.dest('build'))
   },
-  () => {
+  function packOpera () {
     return gulp.src(['dist/**/*.js', 'dist/**/*.html', 'node_modules/webextension-polyfill/dist/browser-polyfill.js', 'node_modules/underscore/underscore.js', 'icons/**/*.png', 'icons/**/*.min.svg', 'manifest.opera.json', 'LICENSE'], { base: '.' })
       .pipe(rename(path => {
         if (path.basename === 'manifest.opera') {
@@ -105,18 +105,18 @@ let pack = gulp.parallel(
 pack.description = 'Create a source archive in build/ for Firefox and Opera'
 exports.pack = pack
 
-let watch = gulp.series(lintSafe, compile,
-  () => {
+let watch = gulp.series(lintInfo, compile,
+  function watchChanges () {
     return gulp.watch(
       ['src/**/*', 'node_modules/webextension-polyfill/**/*', 'node_modules/underscore/**/*', 'icons/**/*', 'manifest.json', 'package.json'],
-      gulp.parallel(lintSafe, compile)
+      gulp.parallel(lintInfo, compile)
     )
   }
 )
 watch.description = 'Watch source files (and modules) for changes and rebuild'
 exports.watch = watch
 
-let dist = gulp.series(trim, lint, clean, compile)
+let dist = gulp.series(fixEOL, lint, clean, compile)
 let build = gulp.series(dist, pack)
 
 exports.dist = dist
