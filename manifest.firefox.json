@@ -1,46 +1,48 @@
 {
-  "name": "Tab Counter",
-  "short_name": "Tab Counter",
   "author": "DaAwesomeP",
-  "developer": {
-    "name": "DaAwesomeP",
-    "url": "https://addons.mozilla.org/en-US/firefox/user/DaAwesomeP/"
+  "background": {
+    "persistent": true,
+    "scripts": [
+      "dist/background.js"
+    ]
   },
-  "version": "0.4.1",
-  "description": "A button badge that shows the number of tabs open in a window",
-  "homepage_url": "https://github.com/DaAwesomeP/tab-counter",
-  "manifest_version": 2,
+  "browser_action": {
+    "browser_style": true,
+    "default_area": "tabstrip",
+    "default_icon": "icons/tabcounter.plain.min.svg",
+    "default_popup": "dist/popup.html",
+    "default_title": "Tab Counter",
+    "theme_icons": [
+      {
+        "dark": "icons/tabcounter-gray10.plain.min.svg",
+        "light": "icons/tabcounter-gray90.plain.min.svg",
+        "size": 1
+      }
+    ]
+  },
   "browser_specific_settings": {
     "gecko": {
       "id": "tab-counter@daawesomep.addons.mozilla.org",
       "strict_min_version": "52.0"
     }
   },
+  "description": "A button badge that shows the number of tabs open in a window",
+  "developer": {
+    "name": "DaAwesomeP",
+    "url": "https://addons.mozilla.org/en-US/firefox/user/DaAwesomeP/"
+  },
+  "homepage_url": "https://github.com/DaAwesomeP/tab-counter",
   "icons": {
     "1": "icons/tabcounter-logo.plain.min.svg"
+  },
+  "manifest_version": 2,
+  "name": "Tab Counter",
+  "options_ui": {
+    "page": "dist/options.html"
   },
   "permissions": [
     "storage"
   ],
-  "browser_action": {
-    "browser_style": true,
-    "default_area": "tabstrip",
-    "default_icon": "icons/tabcounter.plain.min.svg",
-    "theme_icons": [{
-      "dark": "icons/tabcounter-gray10.plain.min.svg",
-      "light": "icons/tabcounter-gray90.plain.min.svg",
-      "size": 1
-    }],
-    "default_popup": "dist/popup.html",
-    "default_title": "Tab Counter"
-  },
-  "options_ui": {
-    "page": "dist/options.html"
-  },
-  "background": {
-    "scripts": [
-      "dist/background.js"
-    ],
-    "persistent": true
-  }
+  "short_name": "Tab Counter",
+  "version": "0.4.1"
 }
