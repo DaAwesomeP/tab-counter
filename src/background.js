@@ -30,13 +30,18 @@ const updateIcon = async function updateIcon () {
   // Stop tab badge update if badge disabled
   if (counterPreference === 3) return
 
-  // Get current tab to update badge in
-  let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
-
-  // Get tabs in current window, tabs in all windows, and the number of windows
-  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length.toString()
-  let allTabs = (await browser.tabs.query({})).length.toString()
-  let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
+  // Get the active tab int the current window
+  //   This is to handle multiple browser windows because
+  //   the details.windowId parameter for browserAction.setBadgeText(details)
+  //   isn't supported by chromium yet
+  // Get tabs in current window, tabs in all windows, and the number of windows as strings
+  let currentTab, currentWindow, allTabs, allWindows
+  [currentTab, currentWindow, allTabs, allWindows] = await Promise.all([
+    /* currentTab */ browser.tabs.query({ currentWindow: true, active: true }).then(v => v[0]),
+    /* currentWindow */ browser.tabs.query({ currentWindow: true }).then(v => v.length.toString()),
+    /* allTabs */ browser.tabs.query({}).then(v => v.length.toString()),
+    /* allWindows */ browser.windows.getAll({ populate: false, windowTypes: ['normal'] }).then(v => v.length.toString())
+  ])
 
   if (typeof currentTab !== 'undefined') {
     let text
