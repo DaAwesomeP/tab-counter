@@ -19,6 +19,7 @@
  */
 
 import { debounce } from 'underscore'
+import browser from 'webextension-polyfill'
 
 const updateIcon = async function updateIcon () {
   // Get settings
