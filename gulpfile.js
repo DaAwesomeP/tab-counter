@@ -54,7 +54,7 @@ fixEOL.description = 'Fix line endings'
 exports.fixEOL = fixEOL
 
 function clean (callback) {
-  del(['dist/*', 'build/*'])
+  del(['dist/*', 'build/*', 'dev/*'])
     .then(() => callback())
 }
 clean.description = 'Remove build artifacts'
@@ -79,6 +79,38 @@ let compile = gulp.parallel(
 )
 compile.description = 'Compile with babel into dist/'
 exports.compile = compile
+
+function cleanDev (callback) {
+  del('dev/*')
+    .then(() => callback())
+}
+
+let devFirefox = gulp.parallel(
+  function compileJs () {
+    return gulp.src('src/**/*.js')
+      .pipe(sourcemaps.init())
+      .pipe(bro({
+        transform: [
+          babelify.configure()
+        ]
+      }))
+      .pipe(sourcemaps.write('.'))
+      .pipe(gulp.dest('dev/dist'))
+  },
+  function compileOther () {
+    return gulp.src(['src/**/*', '!src/**/*.js'])
+      .pipe(gulp.dest('dev/dist'))
+  },
+  function copyManifest () {
+    return gulp.src('manifest.firefox.json')
+      .pipe(rename('manifest.json'))
+      .pipe(gulp.dest('dev'))
+  }
+)
+devFirefox.description = 'Compile files into dev for Firefox testing'
+exports.devFirefox = devFirefox
+exports.dev = gulp.series(cleanDev, devFirefox)
+exports.dev.description = 'Clean Firefox development build'
 
 let pack = gulp.parallel(
   function packFirefox () {
