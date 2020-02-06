@@ -121,6 +121,4 @@ let build = gulp.series(dist, pack)
 
 exports.dist = dist
 exports.build = build
-exports.dirty = gulp.series(clean, compile)
-exports.dirty.description = 'Build from dirty files'
 exports.default = build
