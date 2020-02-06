@@ -6,7 +6,8 @@
         "useBuiltIns": "usage",
         "modules": "commonjs",
         "debug": false,
-        "corejs": 3
+        "corejs": 3,
+        "shippedProposals": true
       }
     ]
   ]

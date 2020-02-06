@@ -1,6 +1,10 @@
 {
     "extends": "standard",
+    "env": {
+      "browser": true,
+      "webextensions": true
+    },
     "globals": {
-      "browser": true
+      "globalThis": "readonly"
     }
 }
