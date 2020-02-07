@@ -24,64 +24,98 @@
     <meta charset="utf-8">
     <title>Tab Counter Options</title>
     <style type="text/css">
-      html {
-        font-family: sans-serif;
+      .option {
+        display: flex;
+        align-items: baseline;
       }
-      tr {
-        margin-bottom: 5px;
+      .label {
+        margin: 0.5ex 1ch;
+        flex-basis: 20%;
+        display: flex;
+        justify-content: flex-end;
       }
-      td {
-        min-width: 400px !important;
+      .field {
+        margin: 0.5ex 1ch;
+        flex-basis: 80%;
+      }
+      .label > *, .field > * {
+        margin: initial;
+      }
+      .label > * {
+        text-align: right;
+      }
+      select {
+        max-width: 40ch;
+      }
+      .description {
+        display: block;
+      }
+
+      .option.disabled {
+        color: grey;
       }
     </style>
   </head>
   <body>
-    <form>
-      <table>
-        <tr style="display: none">
-          <td>Badge Color</td>
-          <td><input type="color" name="badgeColor" id="badgeColor" optionType="string" /></td>
-          <td><em>Unfortuantely, the browser predetermines thefont size of the badge. Setting the badge text color is available in Firefox 63 and above.</em></td>
-        </tr>
-        <tr style="display: none">
-          <td>Automatically set Badge Color</td>
-          <td><input type="checkbox" name="badgeTextColorAuto" id="badgeTextColorAuto" optionType="boolean" /></td>
-          <td><em>When checked, the text color is either white or black based on the highest constrast with the badge color. When unchecked, a manual color may be selected.</em></td>
-        </tr>
-        <tr style="display: none">
-          <td>Badge Text Color (if not automatic)</td>
-          <td><input type="color" name="badgeTextColor" id="badgeTextColor" optionType="string" /></td>
-          <td><em>This option is ignored/disabled unless "Automatically set Badge Color" is unchecked.</em></td>
-        </tr>
-        <tr style="display: none">
-          <td>Icon Color &amp; Style</td>
-          <td>
-            <select name="icon" id="icon" optionType="string" >
-              <option value="tabcounter.plain.min.svg">Tab Counter Default</option>
-              <option value="tabcounter-gray90.plain.min.svg">Tab Counter Gray 90 (Firefox Photon Design System Light Background Icon Color)</option>
-              <option value="tabcounter-gray10.plain.min.svg">Tab Counter Gray 10 (Firefox Photon Design System Dark Background Icon Color)</option>
-              <option value="tabcounter-black.plain.min.svg">Tab Counter Black</option>
-              <option value="tabcounter-white.plain.min.svg">Tab Counter White</option>
-              <option value="clear.plain.min.svg">Clear SVG for Firefox (shows badge only)</option>
-              <option value="clear-1.png">Clear 1px PNG for Opera (shows badge only)</option>
-            </select>
-          </td>
-        </tr>
-        <tr style="display: none">
-          <td>Counter</td>
-          <td>
-            <select name="counter" id="counter" optionType="number">
-              <option value="0">Number of Tabs in Current Window</option>
-              <option value="1">Total Number of Tabs of All Windows</option>
-              <option value="2">Both Number of Tabs in Current Window/Total Number of Tabs of All Windows</option>
-              <option value="4">Total Number of Windows</option>
-              <option value="3">None (disables the counter and hover text; click the icon to see the count)</option>
-            </select>
-          </td>
-          <td><em>A maximum of four characters can be displayed on the badge; this is a browser limitation.</em></td>
-        </tr>
-        <tr>
-      </table>
+    <form id="settings">
+      <p>Unfortunately, the browser predetermines the font size of the badge.</p>
+      <div class="option">
+        <div class="label">
+          <label for="badgeColor">Badge color</label>
+        </div>
+        <div class="field">
+          <input type="color" name="badgeColor" id="badgeColor" class="field" />
+        </div>
+      </div>
+      <div class="option">
+        <div class="label">
+          <label for="badgeTextColorAuto">Automatically set badge color</label>
+        </div>
+        <div class="field">
+          <input type="checkbox" name="badgeTextColorAuto" id="badgeTextColorAuto" />
+          <span class="description">When checked, the text color is either white or black based on the highest constrast with the badge color.</span>
+        </div>
+      </div>
+      <div class="option">
+        <div class="label">
+          <label for="badgeTextColor">Badge text color</label>
+        </div>
+        <div class="field">
+          <input type="color" name="badgeTextColor" id="badgeTextColor" />
+          <span class="description">Setting the badge text color is available in Firefox 63 and above.</span>
+        </div>
+      </div>
+      <div class="option">
+        <div class="label">
+          <label>Icon color &amp; style</label>
+        </div>
+        <div class="field">
+          <select name="icon" id="icon">
+            <option value="tabcounter.plain.min.svg">Tab Counter Default</option>
+            <option value="tabcounter-gray90.plain.min.svg">Tab Counter Gray 90 (Firefox Photon Design System Light Background Icon Color)</option>
+            <option value="tabcounter-gray10.plain.min.svg">Tab Counter Gray 10 (Firefox Photon Design System Dark Background Icon Color)</option>
+            <option value="tabcounter-black.plain.min.svg">Tab Counter Black</option>
+            <option value="tabcounter-white.plain.min.svg">Tab Counter White</option>
+            <option value="clear.plain.min.svg">Clear SVG for Firefox (shows badge only)</option>
+            <option value="clear-1.png">Clear 1px PNG for Opera (shows badge only)</option>
+          </select>
+        </div>
+      </div>
+      <div class="option">
+        <div class="label">
+          <label>Counter value</label>
+        </div>
+        <div class="field">
+          <select name="counter" id="counter">
+            <option value="currentWindow">Number of Tabs in Current Window</option>
+            <option value="allWindows">Total Number of Tabs of All Windows</option>
+            <option value="windowAndAll">Both Number of Tabs in Current Window/Total Number of Tabs of All Windows</option>
+            <option value="nbWindows">Total Number of Windows</option>
+            <option value="none">None (disables the counter and hover text; click the icon to see the count)</option>
+          </select>
+          <span class="description">A maximum of four characters can be displayed on the badge; this is a browser limitation.</span>
+        </div>
+      </div>
     </form>
     <script type="text/javascript" src="options.js"></script>
   </body>
