@@ -18,66 +18,69 @@
  * limitations under the License.
  */
 
-var domReady = false
-var browserReady = false
-var restored = false
+import browser from 'webextension-polyfill'
+
+// TODO add Firefox info
 
 async function checkBadgeColorManualSetting () {
-  let autoSelect = document.querySelector('#badgeTextColorAuto').checked
-  document.querySelector('#badgeTextColor').disabled = autoSelect
+  let autoSelect = document.getElementById('badgeTextColorAuto').checked
+  document.getElementById('badgeTextColor').disabled = autoSelect
 }
 
-async function saveOptions () {
-  checkBadgeColorManualSetting()
+// Called by an event listener on input/select elements
+async function saveOptions (event) {
   let settings = await browser.storage.local.get()
-  for (let setting in settings) {
-    if (setting !== 'version') {
-      let el = document.querySelector(`#${setting}`)
-      if (el.getAttribute('type') === 'checkbox') settings[setting] = el.checked
-      else settings[setting] = el.value
-      let optionType = el.getAttribute('optionType')
-      if (optionType === 'number' && typeof settings[setting] !== 'number') settings[setting] = parseInt(settings[setting])
-      else if (optionType === 'string' && typeof settings[setting] !== 'string') settings[setting] = settings[setting].toString()
-      else if (optionType === 'boolean' && typeof settings[setting] !== 'boolean') settings[setting] = (settings[setting].toLowerCase() === 'true')
-    }
-  }
+
+  settings[event.target.id] =
+    (event.target.type === 'checkbox' ? event.target.checked : event.target.value)
+
   browser.storage.local.set(settings)
+
+  // Only return when the settings have been reloaded
   await browser.runtime.sendMessage({ updateSettings: true })
 }
 
 async function restoreOptions () {
-  restored = true
   let settings = await browser.storage.local.get()
+
   for (let setting in settings) {
     if (setting !== 'version') {
-      let el = document.querySelector(`#${setting}`)
+      let el = document.getElementById(setting)
       if (el.getAttribute('type') === 'checkbox') el.checked = settings[setting]
       else el.value = settings[setting]
-      el.parentElement.parentElement.style.display = 'block'
     }
   }
+
   checkBadgeColorManualSetting()
 }
 
-function start () {
-  browserReady = true
-  if (domReady && !restored) restoreOptions()
-  for (let el of document.querySelectorAll('input, select')) {
-    el.addEventListener('change', saveOptions)
-  }
+// Use async function to wait for DOM
+async function start () {
+
+  // Wait for DOM
+  await new Promise((resolve, reject) => {
+    document.addEventListener('DOMContentLoaded', () => resolve() )
+  })
+
+  // Restore options
+  await restoreOptions()
+
+  // Prevent form submition (even if it's impossible)
+  document.getElementById('settings').addEventListener('submit', e => e.preventDefault())
+
+  // Setup handlers
+  document.querySelectorAll('#settings .field input,select').forEach(elt => {
+    // TODO Preview on input (eg. live color change)
+    elt.addEventListener('input', () => {})
+    // Save the settings on commited change
+    elt.addEventListener('change', saveOptions)
+  })
+
+  // Enable/Disable Text color option depending on if we set it automatically
+  document.getElementById('badgeTextColorAuto')
+    .addEventListener('input', e => {
+      document.getElementById('badgeTextColor').disabled = e.target.checked
+    })
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  domReady = true
-  if (browserReady && !restored) restoreOptions()
-})
-
-if (typeof browser === 'undefined') {
-  var script = document.createElement('script')
-  script.addEventListener('load', () => {
-    start()
-  })
-  script.src = '../node_modules/webextension-polyfill/dist/browser-polyfill.js'
-  script.async = false
-  document.head.appendChild(script)
-} else start()
+start();
