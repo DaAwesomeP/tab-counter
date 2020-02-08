@@ -105,6 +105,10 @@ let devFirefox = gulp.parallel(
     return gulp.src('manifest.firefox.json')
       .pipe(rename('manifest.json'))
       .pipe(gulp.dest('dev'))
+  },
+  function copyAssets () {
+    return gulp.src(['icons/**/clear-*.png', 'icons/**/*.min.svg'], { cwdbase: true })
+      .pipe(gulp.dest('dev'))
   }
 )
 devFirefox.description = 'Compile files into dev for Firefox testing'
