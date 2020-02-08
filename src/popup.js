@@ -18,6 +18,8 @@
  * limitations under the License.
  */
 
+import browser from 'webextension-polyfill'
+
 async function start () {
   let currentWindow = (await browser.tabs.query({ currentWindow: true })).length
   let allTabs = (await browser.tabs.query({})).length
@@ -25,14 +27,8 @@ async function start () {
   document.getElementById('currentWindow').textContent = currentWindow
   document.getElementById('allTabs').textContent = allTabs
   document.getElementById('allWindows').textContent = allWindows
+
+  })
 }
 
-if (typeof browser === 'undefined') {
-  var script = document.createElement('script')
-  script.addEventListener('load', () => {
-    start()
-  })
-  script.src = '../node_modules/webextension-polyfill/dist/browser-polyfill.js'
-  script.async = false
-  document.head.appendChild(script)
-} else start()
+start()
