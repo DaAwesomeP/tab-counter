@@ -54,12 +54,32 @@ async function restoreOptions () {
   checkBadgeColorManualSetting()
 }
 
+// Add a version line at the end of settings form
+function insertVersion () {
+  let manifest = browser.runtime.getManifest()
+
+  let p = document.createElement('p')
+  p.id = 'version-text'
+  p.append(`You are using ${manifest.name} v${manifest.version}` +
+    (manifest.author !== undefined ? ` by ${manifest.author}` : ''))
+
+  let style = document.createElement('style')
+  style.type = 'text/css'
+  style.append('' +
+  '#version-text {' +
+  '  font-style: italic;' +
+  '  font-size: x-small;' +
+  '}')
+
+  document.head.append(style)
+  document.getElementById('settings').append(p)
+}
+
 // Use async function to wait for DOM
 async function start () {
-
   // Wait for DOM
   await new Promise((resolve, reject) => {
-    document.addEventListener('DOMContentLoaded', () => resolve() )
+    document.addEventListener('DOMContentLoaded', () => resolve())
   })
 
   // Restore options
@@ -81,6 +101,9 @@ async function start () {
     .addEventListener('input', e => {
       document.getElementById('badgeTextColor').disabled = e.target.checked
     })
+
+  // Insert version number to subtly indicate that we're done
+  insertVersion()
 }
 
-start();
+start()

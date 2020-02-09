@@ -3,8 +3,5 @@
     "env": {
       "browser": true,
       "webextensions": true
-    },
-    "globals": {
-      "globalThis": "readonly"
     }
 }
