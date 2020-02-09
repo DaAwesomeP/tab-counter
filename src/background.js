@@ -45,10 +45,10 @@ const updateIcon = async function updateIcon () {
 
   if (typeof currentTab !== 'undefined') {
     let text
-    if (counterPreference === 0) text = currentWindow // Badge shows current window
-    else if (counterPreference === 1) text = allTabs // Badge shows total of all windows
-    else if (counterPreference === 2) text = `${currentWindow}/${allTabs}` // Badge shows both (Firefox limits to about 4 characters based on width)
-    else if (counterPreference === 4) text = allWindows // Badge shows total of all windows
+    if (counterPreference === 'currentWindow') text = currentWindow // Badge shows current window
+    else if (counterPreference === 'allWindows') text = allTabs // Badge shows total of all windows
+    else if (counterPreference === 'windowAndAll') text = `${currentWindow}/${allTabs}` // Badge shows both (Firefox limits to about 4 characters based on width)
+    else if (counterPreference === 'nbWindows') text = allWindows // Badge shows total of all windows
 
     // Update the badge
     browser.browserAction.setBadgeText({
@@ -134,6 +134,19 @@ const checkSettings = async function checkSettings (settingsUpdate) {
     if (versionSplit[0] === 0 && versionSplit[1] < 4 && browserInfo.vendor === 'Mozilla' && browserInfo.name === 'Firefox' && browserVersionSplit[0] >= 63) {
       settings.badgeTextColorAuto = true
       settings.badgeTextColor = '#000000'
+    }
+
+    // v0.5.0 changes the values of counter
+    // See commit eab84721c214b44265a647826da3b5312a6f30e5
+    if (versionSplit[0] === 0 && versionSplit[1] < 5) {
+      let translationMap = {
+        '0': 'currentWindow',
+        '1': 'allWindows',
+        '2': 'windowAndAll',
+        '4': 'nbWindows',
+        '3': 'none'
+      }
+      settings.counter = translationMap[settings.counter]
     }
   }
   browser.storage.local.set(Object.assign(settings, {
