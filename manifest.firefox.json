@@ -3,6 +3,7 @@
   "background": {
     "persistent": true,
     "scripts": [
+      "dist/utils.js",
       "dist/background.js"
     ]
   },

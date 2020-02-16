@@ -21,15 +21,68 @@
 import { debounce } from 'underscore'
 import browser from 'webextension-polyfill'
 
+// Convert old setting values to new ones
+const upgradeSettings = async function upgradeSettings (settings) {
+  let version = settings.version.split('.').map((n) => parseInt(n))
+
+  // Check if parsed successfully
+  if (!version.every(n => !isNaN(n))) return
+
+  let [major, minor, patch] = version
+
+  /* UPGRADES */
+
+  // since v0.3.0, icons now adapt to theme so reset icon setting
+  if (major === 0 && minor < 3) {
+    settings.icon = 'tabcounter.plain.min.svg'
+  }
+
+  // Forcefully enable badgeTextColorAuto support if at least v0.4.0 and FF 63
+  if (major === 0 && minor < 4 && await isBadgeTextColorAvailable()) {
+    settings.badgeTextColorAuto = true
+  }
+
+  // v0.5.0 changes the values of counter
+  // See commit eab84721c214b44265a647826da3b5312a6f30e5
+  if (major === 0 && minor < 5) {
+    let translationMap = {
+      '0': 'currentWindow',
+      '1': 'allWindows',
+      '2': 'windowAndAll',
+      '4': 'nbWindows',
+      '3': 'none'
+    }
+    settings.counter = translationMap[settings.counter]
+  }
+
+  // Finalize by updating the version
+  settings.version = browser.runtime.getManifest().version
+}
+
+// Assign default value to settings if they don't exist
+const applyDefaultSettings = function applyDefaultSettings (settings) {
+  const defaults = {
+    badgeColor: '#999',
+    badgeTextColorAuto: true,
+    badgeTextColor: '#000',
+    icon: 'tabcounter.plain.min.svg',
+    counter: 'currentWindow'
+  }
+
+  Object.assign(defaults, settings)
+
+  return defaults
+}
+
 const updateIcon = async function updateIcon () {
   // Get settings
   let settings = await browser.storage.local.get()
 
   // Get tab counter setting
-  let counterPreference = settings.counter || 0
+  let counterPreference = settings.counter || 'currentWindow'
 
   // Stop tab badge update if badge disabled
-  if (counterPreference === 3) return
+  if (counterPreference === 'none') return
 
   // Get the active tab int the current window
   //   This is to handle multiple browser windows because
@@ -76,10 +129,6 @@ const lazyActivateUpdateIcon = debounce(updateIcon, 1000, { leading: true })
 // Must be a function to avoid event parameter errors
 const update = function update () { setTimeout(lazyUpdateIcon, 150) }
 
-// Init badge for when addon starts and not yet loaded tabs
-browser.browserAction.setBadgeText({ text: 'wait' })
-browser.browserAction.setBadgeBackgroundColor({ color: '#000000' })
-
 // Handler for when current tab changes
 const tabOnActivatedHandler = function tabOnActivatedHandler () {
   // Run normal update for most events
@@ -93,19 +142,8 @@ const tabOnActivatedHandler = function tabOnActivatedHandler () {
 const checkSettings = async function checkSettings (settingsUpdate) {
   // Get settings object
   let settings = await browser.storage.local.get()
-  // Get the browser name and version
-  let browserInfo
-  if (browser.runtime.hasOwnProperty('getBrowserInfo')) browserInfo = await browser.runtime.getBrowserInfo()
-  else {
-    browserInfo = { // polyfill doesn't seem to support this method, but we're only concerned with FF at the moment
-      version: '0',
-      vendor: '',
-      name: ''
-    }
-  }
-  const browserVersionSplit = browserInfo.version.split('.').map((n) => parseInt(n))
 
-  // Set base defaults if new insall
+  // Set base defaults if new install
   if (!settings.hasOwnProperty('version')) {
     settings = {
       version: '0.0.0',
@@ -117,38 +155,11 @@ const checkSettings = async function checkSettings (settingsUpdate) {
 
   // Perform settings upgrade
   if (settings.version !== browser.runtime.getManifest().version) {
-    let versionSplit = settings.version.split('.').map((n) => parseInt(n))
-    // Upgrade
-
-    // since v0.3.0, icons now adapt to theme so reset icon setting
-    if (versionSplit[0] === 0 && versionSplit[1] < 3) settings.icon = 'tabcounter.plain.min.svg'
-
-    // disable the "both" counter option in version v0.3.0 due to the four-character badge limit (renders the feature uselss)
-    if (versionSplit[0] === 0 && versionSplit[1] < 3) {
-      if (settings.hasOwnProperty('counter')) {
-        if (settings.counter === 2) settings.counter = 0
-      }
-    }
-
-    // add badgeTextColor support if at least v0.4.0 and FF 63
-    if (versionSplit[0] === 0 && versionSplit[1] < 4 && browserInfo.vendor === 'Mozilla' && browserInfo.name === 'Firefox' && browserVersionSplit[0] >= 63) {
-      settings.badgeTextColorAuto = true
-      settings.badgeTextColor = '#000000'
-    }
-
-    // v0.5.0 changes the values of counter
-    // See commit eab84721c214b44265a647826da3b5312a6f30e5
-    if (versionSplit[0] === 0 && versionSplit[1] < 5) {
-      let translationMap = {
-        '0': 'currentWindow',
-        '1': 'allWindows',
-        '2': 'windowAndAll',
-        '4': 'nbWindows',
-        '3': 'none'
-      }
-      settings.counter = translationMap[settings.counter]
-    }
+    await upgradeSettings(settings)
   }
+
+  applyDefaultSettings()
+
   browser.storage.local.set(Object.assign(settings, {
     version: browser.runtime.getManifest().version
   }))
@@ -169,11 +180,11 @@ const checkSettings = async function checkSettings (settingsUpdate) {
 
   // Get counter preference
   let counterPreference
-  if (!settings.hasOwnProperty('counter')) counterPreference = 0
+  if (!settings.hasOwnProperty('counter')) counterPreference = 'currentWindow'
   else counterPreference = settings.counter
 
   // Either add badge update events or don't if not set to
-  if (counterPreference !== 3) {
+  if (counterPreference !== 'none') {
     // Watch for tab and window events five seconds after browser startup
     setTimeout(() => {
       browser.tabs.onActivated.addListener(tabOnActivatedHandler)
@@ -222,19 +233,22 @@ const checkSettings = async function checkSettings (settingsUpdate) {
 }
 
 // Load settings and update badge at app start
-const applyAll = async function applyAll (settingsUpdate) {
-  await checkSettings(settingsUpdate) // Icon and badge color
+const reloadSettings = async function reloadSettings () {
+  await checkSettings() // Icon and badge color
   await update() // Badge text options
 }
-applyAll()
-
-// Listen for settings changes and update color, icon, and badge text instantly
-// Bug: this listener run nonstop
-// browser.storage.onChanged.addListener(applyAll)
 
 // Listen for internal addon messages
 const messageHandler = async function messageHandler (request, sender, sendResponse) {
   // Check for a settings update
-  if (request.hasOwnProperty('updateSettings')) if (request.updateSettings) applyAll(true)
+  if (request.updateSettings) {
+    reloadSettings()
+  }
 }
 browser.runtime.onMessage.addListener(messageHandler)
+
+// Init badge for when addon starts and not yet loaded tabs
+browser.browserAction.setBadgeText({ text: '...' })
+browser.browserAction.setBadgeBackgroundColor({ color: '#000000' })
+
+reloadSettings()
