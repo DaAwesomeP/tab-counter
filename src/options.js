@@ -75,13 +75,7 @@ function insertVersion () {
   document.getElementById('settings').append(p)
 }
 
-// Use async function to wait for DOM
 async function start () {
-  // Wait for DOM
-  await new Promise((resolve, reject) => {
-    document.addEventListener('DOMContentLoaded', () => resolve())
-  })
-
   // Restore options
   await restoreOptions()
 
@@ -106,4 +100,5 @@ async function start () {
   insertVersion()
 }
 
-start()
+// Wait for DOM
+document.addEventListener('DOMContentLoaded', start)
