@@ -20,8 +20,6 @@
 
 import browser from 'webextension-polyfill'
 
-// TODO add Firefox info
-
 async function checkBadgeColorManualSetting () {
   let autoSelect = document.getElementById('badgeTextColorAuto').checked
   document.getElementById('badgeTextColor').disabled = autoSelect
@@ -75,26 +73,44 @@ function insertVersion () {
   document.getElementById('settings').append(p)
 }
 
+// Badge Test color is only available in Firefox
+// So remove those options when it's not available
+async function removeTextColorInNotFirefox () {
+  if (!(await isBadgeTextColorAvailable())) {
+    document.getElementById('badgeTextColorAuto').closest('.option').remove()
+    document.getElementById('badgeTextColor').closest('.option').remove()
+  }
+}
+
 async function start () {
-  // Restore options
-  await restoreOptions()
+  async function setup () {
+    // Restore options
+    await restoreOptions()
 
-  // Prevent form submition (even if it's impossible)
-  document.getElementById('settings').addEventListener('submit', e => e.preventDefault())
+    // Prevent form submition (even if it's impossible)
+    document.getElementById('settings').addEventListener('submit', e => e.preventDefault())
 
-  // Setup handlers
-  document.querySelectorAll('#settings .field input,select').forEach(elt => {
-    // TODO Preview on input (eg. live color change)
-    elt.addEventListener('input', () => {})
-    // Save the settings on commited change
-    elt.addEventListener('change', saveOptions)
-  })
-
-  // Enable/Disable Text color option depending on if we set it automatically
-  document.getElementById('badgeTextColorAuto')
-    .addEventListener('input', e => {
-      document.getElementById('badgeTextColor').disabled = e.target.checked
+    // Setup handlers
+    document.querySelectorAll('#settings .field input,select').forEach(elt => {
+      // TODO Preview on input (eg. live color change)
+      elt.addEventListener('input', () => {})
+      // Save the settings on commited change
+      elt.addEventListener('change', saveOptions)
     })
+
+    // Enable/Disable Text color option depending on if we set it automatically
+    document.getElementById('badgeTextColorAuto')
+      .addEventListener('input', e => {
+        document.getElementById('badgeTextColor').disabled = e.target.checked
+      })
+
+    // Disable badge text color options in not Firefox browsers
+    let removeTextColorP = removeTextColorInNotFirefox()
+
+    return Promise.all([removeTextColorP])
+  }
+
+  await setup()
 
   // Insert version number to subtly indicate that we're done
   insertVersion()
