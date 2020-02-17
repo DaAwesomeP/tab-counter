@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-import { debounce } from 'underscore'
+import { throttle } from 'underscore'
 import browser from 'webextension-polyfill'
 
 
@@ -30,7 +30,7 @@ const updateIcon = async function updateIcon () {
   let settings = await browser.storage.local.get()
 
   // Get tab counter setting
-  let counterPreference = settings.counter || 'currentWindow'
+  let counterPreference = settings.counter
 
   // Stop tab badge update if badge disabled
   if (counterPreference === 'none') return
@@ -69,10 +69,10 @@ const updateIcon = async function updateIcon () {
 }
 
 // Prevent from firing too frequently or flooding at a window or restore
-const lazyUpdateIcon = debounce(updateIcon, 250)
+const lazyUpdateIcon = throttle(updateIcon, 250)
 
 // Prioritize active leading edge of every 1 second on tab switch (fluid update for new tabs)
-const lazyActivateUpdateIcon = debounce(updateIcon, 1000, { leading: true })
+const lazyActivateUpdateIcon = throttle(updateIcon, 1000, { leading: true })
 
 // Will be error if tab has been removed, so wait 150ms;
 // onActivated fires slightly before onRemoved,
