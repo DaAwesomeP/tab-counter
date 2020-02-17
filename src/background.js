@@ -22,6 +22,7 @@ import { debounce } from 'underscore'
 import browser from 'webextension-polyfill'
 
 // Convert old setting values to new ones
+// It saves the new settings, and modifies passed object in-place
 const upgradeSettings = async function upgradeSettings (settings) {
   let version = settings.version.split('.').map((n) => parseInt(n))
 
@@ -55,8 +56,12 @@ const upgradeSettings = async function upgradeSettings (settings) {
     settings.counter = translationMap[settings.counter]
   }
 
-  // Finalize by updating the version
+  // Add potentially new defaults if not already set for compatibility
+  Object.assign(settings, makeDefaultSettings(settings))
+
+  // Finalize by updating the version and saving it
   settings.version = browser.runtime.getManifest().version
+  browser.storage.local.set(settings)
 }
 
 // Assign default value to settings if they don't exist **excluding version**
@@ -136,28 +141,16 @@ const tabOnActivatedHandler = function tabOnActivatedHandler () {
   lazyActivateUpdateIcon()
 }
 
-// Load and apply icon and badge color settings
+// Load, upgrade and apply icon and badge color settings
 const checkSettings = async function checkSettings (settingsUpdate) {
   // Get settings object
   let settings = await browser.storage.local.get()
   const currentVersion = browser.runtime.getManifest().version
 
-  /* Checking the settings */
-
-  // Use and save defaults if new install
-  if (!settings.hasOwnProperty('version')) {
-    console.log('New install of tab-counter, applying default settings')
-    settings = makeDefaultSettings(settings)
-    settings.version = currentVersion
-    browser.storage.local.set(settings)
-  }
-
   // Perform settings upgrade
   if (settings.version !== currentVersion) {
     await upgradeSettings(settings)
   }
-
-  /* Updating the behaviour */
 
   // Sanity check
   settings = makeDefaultSettings(settings)
@@ -178,11 +171,8 @@ const checkSettings = async function checkSettings (settingsUpdate) {
   // Apply selected icon
   browser.browserAction.setIcon({ path: `icons/${settings.icon}` })
 
-  // Get counter preference
-  let counterPreference = settings.counter
-
   // Either add badge update events or don't if not set to
-  if (counterPreference !== 'none') {
+  if (settings.counter !== 'none') {
     // Watch for tab and window events five seconds after browser startup
     setTimeout(() => {
       browser.tabs.onActivated.addListener(tabOnActivatedHandler)
@@ -245,8 +235,24 @@ const messageHandler = async function messageHandler (request, sender, sendRespo
 }
 browser.runtime.onMessage.addListener(messageHandler)
 
-// Init badge for when addon starts and not yet loaded tabs
-browser.browserAction.setBadgeText({ text: '...' })
-browser.browserAction.setBadgeBackgroundColor({ color: '#000000' })
+// Async because we need await
+async function start () {
+  // Init badge for when addon starts and not yet loaded tabs
+  browser.browserAction.setBadgeText({ text: '...' })
+  browser.browserAction.setBadgeBackgroundColor({ color: '#000' })
+  // NB: loading color is black, setting default is grey
 
-reloadSettings()
+  // Initialize settings on new install
+  let settings = await browser.storage.local.get()
+  if (!settings.hasOwnProperty('version')) {
+    console.log('New install of tab-counter, applying default settings')
+    settings = makeDefaultSettings(settings)
+    settings.version = currentVersion
+    browser.storage.local.set(settings)
+  }
+
+  // Load and apply settings
+  reloadSettings()
+}
+
+start()
