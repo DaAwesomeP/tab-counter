@@ -230,9 +230,9 @@ const checkSettings = async function checkSettings (settingsUpdate) {
   }
 }
 
-// Load settings and update badge at app start
-const reloadSettings = async function reloadSettings () {
-  await checkSettings() // Icon and badge color
+// Load settings and update badge
+const reloadSettings = async function reloadSettings (updated) {
+  await checkSettings(updated) // Icon and badge color
   await update() // Badge text options
 }
 
@@ -240,7 +240,7 @@ const reloadSettings = async function reloadSettings () {
 const messageHandler = async function messageHandler (request, sender, sendResponse) {
   // Check for a settings update
   if (request.updateSettings) {
-    reloadSettings()
+    reloadSettings(/* update now */ true)
   }
 }
 browser.runtime.onMessage.addListener(messageHandler)
