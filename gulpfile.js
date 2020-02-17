@@ -116,6 +116,14 @@ exports.devFirefox = devFirefox
 exports.dev = gulp.series(cleanDev, devFirefox)
 exports.dev.description = 'Clean Firefox development build'
 
+let devPack = gulp.series(cleanDev, devFirefox, function packFirefox () {
+  return gulp.src(['dev/**/*'])
+  .pipe(zip('tab-counter.firefox.zip'))
+  .pipe(gulp.dest('dev/build'))
+})
+devPack.description = 'Build for firefox and pack into a zip file'
+exports.devPack = devPack
+
 let pack = gulp.parallel(
   function packFirefox () {
     return gulp.src(['dist/**/*', '!dist/**/*.map', 'node_modules/underscore/**/*', 'icons/**/clear-*.png', 'icons/**/*.min.svg', 'manifest.firefox.json', 'LICENSE'], { base: '.' })
