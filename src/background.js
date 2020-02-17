@@ -266,18 +266,11 @@ browser.runtime.onInstalled.addListener(async ({ reason, temporary }) => {
   }
 })
 
-// Async because we need await
-async function start () {
-  // Init badge for when addon starts and not yet loaded tabs
-  browser.browserAction.setBadgeText({ text: '...' })
-  browser.browserAction.setBadgeBackgroundColor({ color: '#000' })
-  // NB: loading color is black, setting default is grey
+// Init badge for when addon starts and not yet loaded tabs
+// NB: loading color is black, setting default is grey
+browser.browserAction.setBadgeText({ text: '...' })
+browser.browserAction.setBadgeBackgroundColor({ color: '#000' })
 
-  // Just in case we need to upgrade/initialize settings at startup
-  await refreshSettings()
-
-  // Load and apply settings
-  await reloadSettings()
-}
-
-start()
+// Load settings
+refreshSettings()
+.then(reloadSettings)
