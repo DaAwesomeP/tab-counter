@@ -21,64 +21,12 @@
 import { debounce } from 'underscore'
 import browser from 'webextension-polyfill'
 
-// Convert old setting values to new ones
-// It saves the new settings, and modifies passed object in-place
-const upgradeSettings = async function upgradeSettings (settings) {
-  let version = settings.version.split('.').map((n) => parseInt(n))
 
-  // Check if parsed successfully
-  if (!version.every(n => !isNaN(n))) return
-
-  let [major, minor, patch] = version
-
-  /* UPGRADES */
-
-  // since v0.3.0, icons now adapt to theme so reset icon setting
-  if (major === 0 && minor < 3) {
-    settings.icon = 'tabcounter.plain.min.svg'
-  }
-
-  // Forcefully enable badgeTextColorAuto support if at least v0.4.0 and FF 63
-  if (major === 0 && minor < 4) {
-    settings.badgeTextColorAuto = await isBadgeTextColorAvailable()
-  }
-
-  // v0.5.0 changes the values of counter
-  // See commit eab84721c214b44265a647826da3b5312a6f30e5
-  if (major === 0 && minor < 5) {
-    let translationMap = {
-      '0': 'currentWindow',
-      '1': 'allWindows',
-      '2': 'windowAndAll',
-      '4': 'nbWindows',
-      '3': 'none'
-    }
-    settings.counter = translationMap[settings.counter]
-  }
-
-  // Add potentially new defaults if not already set for compatibility
-  Object.assign(settings, makeDefaultSettings(settings))
-
-  // Finalize by updating the version and saving it
-  settings.version = browser.runtime.getManifest().version
-  browser.storage.local.set(settings)
-}
-
-// Assign default value to settings if they don't exist **excluding version**
-const makeDefaultSettings = function makeDefaultSettings (settings) {
-  const defaults = {
-    badgeColor: '#999',
-    badgeTextColorAuto: true,
-    badgeTextColor: '#000',
-    icon: 'tabcounter.plain.min.svg',
-    counter: 'currentWindow'
-  }
-
-  return Object.assign(defaults, settings)
-}
+/* Updating the icon */
 
 const updateIcon = async function updateIcon () {
   // Get settings
+  // Is this a performance issue ? -> ~5ms
   let settings = await browser.storage.local.get()
 
   // Get tab counter setting
@@ -141,19 +89,88 @@ const tabOnActivatedHandler = function tabOnActivatedHandler () {
   lazyActivateUpdateIcon()
 }
 
-// Load, upgrade and apply icon and badge color settings
-const checkSettings = async function checkSettings (settingsUpdate) {
-  // Get settings object
+/* Settings */
+
+// The following two function: upgradeSettings and makeDefaultSettings are
+// only used in refreshSettings.
+// They are separated for convenience of modification and upgrade
+
+// Convert old setting values to new ones
+// It modifies passed object in-place
+const upgradeSettings = async function upgradeSettings (settings) {
+  let version = settings.version.split('.').map((n) => parseInt(n))
+
+  // Check if parsed successfully
+  if (!version.every(n => !isNaN(n))) return
+
+  let [major, minor, patch] = version
+
+  /* UPGRADES */
+
+  // since v0.3.0, icons now adapt to theme so reset icon setting
+  if (major === 0 && minor < 3) {
+    settings.icon = 'tabcounter.plain.min.svg'
+  }
+
+  // Forcefully enable badgeTextColorAuto support if at least v0.4.0 and FF 63
+  if (major === 0 && minor < 4) {
+    settings.badgeTextColorAuto = await isBadgeTextColorAvailable()
+  }
+  // Actually forcefully enable it anyways (for browser upgrades)
+  settings.badgeTextColorAuto = await isBadgeTextColorAvailable()
+
+  // v0.5.0 changes the values of counter
+  // See commit eab84721c214b44265a647826da3b5312a6f30e5
+  if (major === 0 && minor < 5) {
+    let translationMap = {
+      '0': 'currentWindow',
+      '1': 'allWindows',
+      '2': 'windowAndAll',
+      '4': 'nbWindows',
+      '3': 'none'
+    }
+    settings.counter = translationMap[settings.counter]
+  }
+
+  // Finalize by updating the version and saving it
+  settings.version = browser.runtime.getManifest().version
+}
+
+// Assign default value to settings if they don't exist **excluding version**
+const makeDefaultSettings = function makeDefaultSettings (settings) {
+  const defaults = {
+    badgeColor: '#999',
+    badgeTextColorAuto: true,
+    badgeTextColor: '#000',
+    icon: 'tabcounter.plain.min.svg',
+    counter: 'currentWindow'
+  }
+
+  return Object.assign(defaults, settings)
+}
+
+// Make sure settings are up to date and valid by loading, checking and saving them
+const refreshSettings = async function refreshSettings () {
   let settings = await browser.storage.local.get()
   const currentVersion = browser.runtime.getManifest().version
 
-  // Perform settings upgrade
-  if (settings.version !== currentVersion) {
+  if (!settings.hasOwnProperty('version')) {
+    // New install
+    settings.version = currentVersion
+  } else if (settings.version !== currentVersion) {
+    // Upgrade settings
     await upgradeSettings(settings)
   }
 
-  // Sanity check
+  // Add in defaults and save
   settings = makeDefaultSettings(settings)
+  browser.storage.local.set(settings)
+}
+
+// Load and apply icon and badge color settings
+const loadSettings = async function loadSettings (settingsUpdate) {
+  // Get settings object
+  let settings = await browser.storage.local.get()
 
   // Apply badge color
   browser.browserAction.setBadgeBackgroundColor({ color: settings.badgeColor })
@@ -222,10 +239,11 @@ const checkSettings = async function checkSettings (settingsUpdate) {
 
 // Load settings and update badge
 const reloadSettings = async function reloadSettings (updated) {
-  await checkSettings(updated) // Icon and badge color
+  await loadSettings(updated) // Icon and badge color
   await update() // Badge text options
 }
 
+/* Message handlers */
 // Listen for internal addon messages
 const messageHandler = async function messageHandler (request, sender, sendResponse) {
   // Check for a settings update
@@ -233,7 +251,20 @@ const messageHandler = async function messageHandler (request, sender, sendRespo
     reloadSettings(/* update now */ true)
   }
 }
+
 browser.runtime.onMessage.addListener(messageHandler)
+/* Installs and upgrades */
+browser.runtime.onInstalled.addListener(async ({ reason, temporary }) => {
+  if (temporary) return; // skip during development
+
+  switch (reason) {
+  case 'install':
+  case 'update':
+  case 'browser_update': // To handle enabling new browser features
+    refreshSettings()
+    break
+  }
+})
 
 // Async because we need await
 async function start () {
@@ -242,17 +273,11 @@ async function start () {
   browser.browserAction.setBadgeBackgroundColor({ color: '#000' })
   // NB: loading color is black, setting default is grey
 
-  // Initialize settings on new install
-  let settings = await browser.storage.local.get()
-  if (!settings.hasOwnProperty('version')) {
-    console.log('New install of tab-counter, applying default settings')
-    settings = makeDefaultSettings(settings)
-    settings.version = currentVersion
-    browser.storage.local.set(settings)
-  }
+  // Just in case we need to upgrade/initialize settings at startup
+  await refreshSettings()
 
   // Load and apply settings
-  reloadSettings()
+  await reloadSettings()
 }
 
 start()
