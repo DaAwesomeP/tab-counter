@@ -38,8 +38,8 @@ const upgradeSettings = async function upgradeSettings (settings) {
   }
 
   // Forcefully enable badgeTextColorAuto support if at least v0.4.0 and FF 63
-  if (major === 0 && minor < 4 && await isBadgeTextColorAvailable()) {
-    settings.badgeTextColorAuto = true
+  if (major === 0 && minor < 4) {
+    settings.badgeTextColorAuto = await isBadgeTextColorAvailable()
   }
 
   // v0.5.0 changes the values of counter
@@ -142,46 +142,46 @@ const tabOnActivatedHandler = function tabOnActivatedHandler () {
 const checkSettings = async function checkSettings (settingsUpdate) {
   // Get settings object
   let settings = await browser.storage.local.get()
+  const currentVersion = browser.runtime.getManifest().version
 
-  // Set base defaults if new install
+  /* Checking the settings */
+
+  // Use and save defaults if new install
   if (!settings.hasOwnProperty('version')) {
-    settings = {
-      version: '0.0.0',
-      icon: 'tabcounter.plain.min.svg',
-      counter: 0,
-      badgeColor: '#999999'
-    }
+    console.log('New install of tab-counter, applying default settings')
+    settings = makeDefaultSettings(settings)
+    settings.version = currentVersion
+    browser.storage.local.set(settings)
   }
 
   // Perform settings upgrade
-  if (settings.version !== browser.runtime.getManifest().version) {
+  if (settings.version !== currentVersion) {
     await upgradeSettings(settings)
   }
 
-  applyDefaultSettings()
+  /* Updating the behaviour */
 
-  browser.storage.local.set(Object.assign(settings, {
-    version: browser.runtime.getManifest().version
-  }))
+  // Sanity check
+  settings = makeDefaultSettings(settings)
 
-  // Apply badge color or use default
-  if (settings.hasOwnProperty('badgeColor')) browser.browserAction.setBadgeBackgroundColor({ color: settings.badgeColor })
-  else browser.browserAction.setBadgeBackgroundColor({ color: '#000000' })
+  // Apply badge color
+  browser.browserAction.setBadgeBackgroundColor({ color: settings.badgeColor })
 
   // Apply badge text color or use default if not set or not supported
-  if (settings.hasOwnProperty('badgeTextColor')) {
-    if (settings.badgeTextColorAuto !== true) browser.browserAction.setBadgeTextColor({ color: settings.badgeTextColor })
-    else browser.browserAction.setBadgeTextColor({ color: null })
+  if (await isBadgeTextColorAvailable()) {
+    if (settings.badgeTextColorAuto) {
+      // Reset to automatic badge color
+      browser.browserAction.setBadgeTextColor({ color: null })
+    } else {
+      browser.browserAction.setBadgeTextColor({ color: settings.badgeTextColor })
+    }
   }
 
-  // Apply icon selection or use default
-  if (settings.hasOwnProperty('icon')) browser.browserAction.setIcon({ path: `icons/${settings.icon}` })
-  else browser.browserAction.setIcon({ path: 'icons/tabcounter.plain.min.svg' })
+  // Apply selected icon
+  browser.browserAction.setIcon({ path: `icons/${settings.icon}` })
 
   // Get counter preference
-  let counterPreference
-  if (!settings.hasOwnProperty('counter')) counterPreference = 'currentWindow'
-  else counterPreference = settings.counter
+  let counterPreference = settings.counter
 
   // Either add badge update events or don't if not set to
   if (counterPreference !== 'none') {

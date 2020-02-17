@@ -1,4 +1,5 @@
 // setBadgeTextColor is available in Firefox >= 63
+// The result can be easily cached if it needs to be
 async function isBadgeTextColorAvailable () {
   if (!browser.runtime.hasOwnProperty('getBrowserInfo')) {
     // It is not Firefox
