@@ -59,8 +59,8 @@ const upgradeSettings = async function upgradeSettings (settings) {
   settings.version = browser.runtime.getManifest().version
 }
 
-// Assign default value to settings if they don't exist
-const applyDefaultSettings = function applyDefaultSettings (settings) {
+// Assign default value to settings if they don't exist **excluding version**
+const makeDefaultSettings = function makeDefaultSettings (settings) {
   const defaults = {
     badgeColor: '#999',
     badgeTextColorAuto: true,
@@ -69,9 +69,7 @@ const applyDefaultSettings = function applyDefaultSettings (settings) {
     counter: 'currentWindow'
   }
 
-  Object.assign(defaults, settings)
-
-  return defaults
+  return Object.assign(defaults, settings)
 }
 
 const updateIcon = async function updateIcon () {
