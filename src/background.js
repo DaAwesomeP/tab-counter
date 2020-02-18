@@ -164,7 +164,7 @@ const refreshSettings = async function refreshSettings () {
 }
 
 // Load and apply icon and badge color settings
-const loadSettings = async function loadSettings (settingsUpdate) {
+const loadSettings = async function loadSettings () {
   // Get settings object
   let settings = await browser.storage.local.get()
 
@@ -186,20 +186,17 @@ const loadSettings = async function loadSettings (settingsUpdate) {
 
   // Either add badge update events or don't if not set to
   if (settings.counter !== 'none') {
-    // Watch for tab and window events five seconds after browser startup
-    setTimeout(() => {
-      browser.tabs.onActivated.addListener(forceUpdate)
-      browser.tabs.onAttached.addListener(update)
-      browser.tabs.onCreated.addListener(update)
-      browser.tabs.onDetached.addListener(update)
-      browser.tabs.onMoved.addListener(update)
-      browser.tabs.onReplaced.addListener(update)
-      browser.tabs.onUpdated.addListener(update)
-      browser.tabs.onRemoved.addListener(lateUpdate)
-      browser.windows.onCreated.addListener(update)
-      browser.windows.onRemoved.addListener(update)
-      browser.windows.onFocusChanged.addListener(update)
-    }, settingsUpdate ? 1 : 5000) // add listeners immeadietly if not browser startup
+    browser.tabs.onActivated.addListener(forceUpdate)
+    browser.tabs.onAttached.addListener(update)
+    browser.tabs.onCreated.addListener(update)
+    browser.tabs.onDetached.addListener(update)
+    browser.tabs.onMoved.addListener(update)
+    browser.tabs.onReplaced.addListener(update)
+    browser.tabs.onRemoved.addListener(lateUpdate)
+    browser.tabs.onUpdated.addListener(update) // NB: Maybe useful for hidden ?
+    browser.windows.onCreated.addListener(update)
+    browser.windows.onRemoved.addListener(update)
+    browser.windows.onFocusChanged.addListener(update)
   } else {
     // remove the listeners that were added
     browser.tabs.onActivated.removeListener(forceUpdate)
@@ -233,18 +230,13 @@ const loadSettings = async function loadSettings (settingsUpdate) {
   }
 }
 
-// Load settings and update badge
-const reloadSettings = async function reloadSettings (updated) {
-  await loadSettings(updated) // Icon and badge color
-  await update() // Badge text options
-}
-
 /* Message handlers */
 // Listen for internal addon messages
 const messageHandler = async function messageHandler (request, sender, sendResponse) {
   // Check for a settings update
   if (request.updateSettings) {
-    reloadSettings(/* update now */ true)
+    loadSettings()
+    .then(forceUpdate)
   }
 }
 
@@ -267,6 +259,8 @@ browser.runtime.onInstalled.addListener(async ({ reason, temporary }) => {
 browser.browserAction.setBadgeText({ text: '...' })
 browser.browserAction.setBadgeBackgroundColor({ color: '#000' })
 
-// Load settings
 refreshSettings()
-.then(reloadSettings)
+// Wait two seconds before starting listeners to let the browser restore tabs, etc…
+.then((resolve, reject) => { setTimeout(resolve, 2000) })
+.then(loadSettings)
+.then(update)
