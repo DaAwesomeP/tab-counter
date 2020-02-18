@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-import { throttle } from 'underscore'
+import throttle from 'lodash.throttle'
 import browser from 'webextension-polyfill'
 
 
@@ -71,10 +71,10 @@ const updateIcon = async function updateIcon () {
 // Prevent from firing too frequently or flooding at a window or restore
 const lazyUpdateIcon = throttle(updateIcon, 250)
 
-// Prioritize active leading edge of every 1 second on tab switch (fluid update for new tabs)
-const lazyActivateUpdateIcon = throttle(updateIcon, 1000, { leading: true })
+// lateUpdate is used for onRemoved as it fires too early
+// and the count is one too many. So wait 150ms
+// see https://bugzilla.mozilla.org/show_bug.cgi?id=1396758
 
-// Will be error if tab has been removed, so wait 150ms;
 // onActivated fires slightly before onRemoved,
 // but tab is gone during onActivated.
 // Must be a function to avoid event parameter errors
@@ -82,11 +82,9 @@ const update = function update () { setTimeout(lazyUpdateIcon, 150) }
 
 // Handler for when current tab changes
 const tabOnActivatedHandler = function tabOnActivatedHandler () {
-  // Run normal update for most events
-  update()
-
-  // Prioritize active (fluid update for new tabs)
-  lazyActivateUpdateIcon()
+  lazyUpdateIcon()
+  // Call it immediatetely to have a fluid update for new tabs
+  lazyUpdateIcon.flush()
 }
 
 /* Settings */
