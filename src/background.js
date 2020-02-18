@@ -69,22 +69,19 @@ const updateIcon = async function updateIcon () {
 }
 
 // Prevent from firing too frequently or flooding at a window or restore
-const lazyUpdateIcon = throttle(updateIcon, 250)
+const update = throttle(updateIcon, 250)
 
 // lateUpdate is used for onRemoved as it fires too early
 // and the count is one too many. So wait 150ms
 // see https://bugzilla.mozilla.org/show_bug.cgi?id=1396758
+const lateUpdate = function lateUpdate () {
+  setTimeout(update, 150)
+}
 
-// onActivated fires slightly before onRemoved,
-// but tab is gone during onActivated.
-// Must be a function to avoid event parameter errors
-const update = function update () { setTimeout(lazyUpdateIcon, 150) }
-
-// Handler for when current tab changes
-const tabOnActivatedHandler = function tabOnActivatedHandler () {
-  lazyUpdateIcon()
-  // Call it immediatetely to have a fluid update for new tabs
-  lazyUpdateIcon.flush()
+// Update immediately, used by onActivated for fluidity
+const forceUpdate = function forceUpdate () {
+  update()
+  update.flush()
 }
 
 /* Settings */
@@ -190,27 +187,27 @@ const loadSettings = async function loadSettings (settingsUpdate) {
   if (settings.counter !== 'none') {
     // Watch for tab and window events five seconds after browser startup
     setTimeout(() => {
-      browser.tabs.onActivated.addListener(tabOnActivatedHandler)
+      browser.tabs.onActivated.addListener(forceUpdate)
       browser.tabs.onAttached.addListener(update)
       browser.tabs.onCreated.addListener(update)
       browser.tabs.onDetached.addListener(update)
       browser.tabs.onMoved.addListener(update)
       browser.tabs.onReplaced.addListener(update)
-      browser.tabs.onRemoved.addListener(update)
       browser.tabs.onUpdated.addListener(update)
+      browser.tabs.onRemoved.addListener(lateUpdate)
       browser.windows.onCreated.addListener(update)
       browser.windows.onRemoved.addListener(update)
       browser.windows.onFocusChanged.addListener(update)
     }, settingsUpdate ? 1 : 5000) // add listeners immeadietly if not browser startup
   } else {
     // remove the listeners that were added
-    browser.tabs.onActivated.removeListener(tabOnActivatedHandler)
+    browser.tabs.onActivated.removeListener(forceUpdate)
     browser.tabs.onAttached.removeListener(update)
     browser.tabs.onCreated.removeListener(update)
     browser.tabs.onDetached.removeListener(update)
     browser.tabs.onMoved.removeListener(update)
     browser.tabs.onReplaced.removeListener(update)
-    browser.tabs.onRemoved.removeListener(update)
+    browser.tabs.onRemoved.removeListener(lateUpdate)
     browser.tabs.onUpdated.removeListener(update)
     browser.windows.onCreated.removeListener(update)
     browser.windows.onRemoved.removeListener(update)
