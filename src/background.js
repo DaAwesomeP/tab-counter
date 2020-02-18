@@ -40,30 +40,30 @@ const updateIcon = async function updateIcon () {
   //   the details.windowId parameter for browserAction.setBadgeText(details)
   //   isn't supported by chromium yet
   // Get tabs in current window, tabs in all windows, and the number of windows as strings
-  let [currentTab, currentWindow, allTabs, allWindows] = await Promise.all([
-    /* currentTab */ browser.tabs.query({ currentWindow: true, active: true }).then(v => v[0]),
+  let [currentTabId, currentWindow, allTabs,nbWindows] = await Promise.all([
+    /* currentTab */ browser.tabs.query({ currentWindow: true, active: true }).then(v => v[0].id),
     /* currentWindow */ browser.tabs.query({ currentWindow: true }).then(v => v.length.toString()),
     /* allTabs */ browser.tabs.query({}).then(v => v.length.toString()),
-    /* allWindows */ browser.windows.getAll({ populate: false, windowTypes: ['normal'] }).then(v => v.length.toString())
+    /* nbWindows */ browser.windows.getAll({ populate: false, windowTypes: ['normal'] }).then(v => v.length.toString())
   ])
 
-  if (typeof currentTab !== 'undefined') {
+  if (typeof currentTabId !== 'undefined') {
     let text
     if (counterPreference === 'currentWindow') text = currentWindow // Badge shows current window
     else if (counterPreference === 'allWindows') text = allTabs // Badge shows total of all windows
     else if (counterPreference === 'windowAndAll') text = `${currentWindow}/${allTabs}` // Badge shows both (Firefox limits to about 4 characters based on width)
-    else if (counterPreference === 'nbWindows') text = allWindows // Badge shows total of all windows
+    else if (counterPreference === 'nbWindows') text = nbWindows // Badge shows total of all windows
 
     // Update the badge
     browser.browserAction.setBadgeText({
       text: text,
-      tabId: currentTab.id
+      tabId: currentTabId
     })
 
     // Update the tooltip
     browser.browserAction.setTitle({
-      title: `Tab Counter\nTabs in this window:  ${currentWindow}\nTabs in all windows: ${allTabs}\nNumber of windows: ${allWindows}`,
-      tabId: currentTab.id
+      title: `Tab Counter\nTabs in this window:  ${currentWindow}\nTabs in all windows: ${allTabs}\nNumber of windows: ${nbWindows}`,
+      tabId: currentTabId
     })
   }
 }
@@ -107,12 +107,13 @@ const upgradeSettings = async function upgradeSettings (settings) {
     settings.icon = 'tabcounter.plain.min.svg'
   }
 
+  let badgeTextColorAvailable = await isBadgeTextColorAvailable()
   // Forcefully enable badgeTextColorAuto support if at least v0.4.0 and FF 63
   if (major === 0 && minor < 4) {
-    settings.badgeTextColorAuto = await isBadgeTextColorAvailable()
+    settings.badgeTextColorAuto = badgeTextColorAvailable
   }
   // Actually forcefully enable it anyways (for browser upgrades)
-  settings.badgeTextColorAuto = await isBadgeTextColorAvailable()
+  settings.badgeTextColorAuto = badgeTextColorAvailable
 
   // v0.5.0 changes the values of counter
   // See commit eab84721c214b44265a647826da3b5312a6f30e5
