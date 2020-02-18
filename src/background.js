@@ -40,7 +40,7 @@ const updateIcon = async function updateIcon () {
   //   the details.windowId parameter for browserAction.setBadgeText(details)
   //   isn't supported by chromium yet
   // Get tabs in current window, tabs in all windows, and the number of windows as strings
-  let [currentTabId, currentWindow, allTabs,nbWindows] = await Promise.all([
+  let [currentTabId, currentWindow, allTabs, nbWindows] = await Promise.all([
     /* currentTab */ browser.tabs.query({ currentWindow: true, active: true }).then(v => v[0].id),
     /* currentWindow */ browser.tabs.query({ currentWindow: true }).then(v => v.length.toString()),
     /* allTabs */ browser.tabs.query({}).then(v => v.length.toString()),
@@ -236,21 +236,21 @@ const messageHandler = async function messageHandler (request, sender, sendRespo
   // Check for a settings update
   if (request.updateSettings) {
     loadSettings()
-    .then(forceUpdate)
+      .then(forceUpdate)
   }
 }
 
 browser.runtime.onMessage.addListener(messageHandler)
 /* Installs and upgrades */
 browser.runtime.onInstalled.addListener(async ({ reason, temporary }) => {
-  if (temporary) return; // skip during development
+  if (temporary) return // skip during development
 
   switch (reason) {
-  case 'install':
-  case 'update':
-  case 'browser_update': // To handle enabling new browser features
-    refreshSettings()
-    break
+    case 'install':
+    case 'update':
+    case 'browser_update': // To handle enabling new browser features
+      refreshSettings()
+      break
   }
 })
 
@@ -260,7 +260,7 @@ browser.browserAction.setBadgeText({ text: '...' })
 browser.browserAction.setBadgeBackgroundColor({ color: '#000' })
 
 refreshSettings()
-// Wait two seconds before starting listeners to let the browser restore tabs, etc…
-.then((resolve, reject) => { setTimeout(resolve, 2000) })
-.then(loadSettings)
-.then(update)
+  // Wait two seconds before starting listeners to let the browser restore tabs, etc…
+  .then((resolve, reject) => { setTimeout(resolve, 2000) })
+  .then(loadSettings)
+  .then(update)

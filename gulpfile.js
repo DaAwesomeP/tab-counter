@@ -118,8 +118,8 @@ exports.dev.description = 'Clean Firefox development build'
 
 let devPack = gulp.series(cleanDev, devFirefox, function packFirefox () {
   return gulp.src(['dev/**/*'])
-  .pipe(zip('tab-counter.firefox.zip'))
-  .pipe(gulp.dest('dev/build'))
+    .pipe(zip('tab-counter.firefox.zip'))
+    .pipe(gulp.dest('dev/build'))
 })
 devPack.description = 'Build for firefox and pack into a zip file'
 exports.devPack = devPack
