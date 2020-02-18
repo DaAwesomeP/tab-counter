@@ -21,7 +21,6 @@
 import throttle from 'lodash.throttle'
 import browser from 'webextension-polyfill'
 
-
 /* Updating the icon */
 
 const updateIcon = async function updateIcon () {
