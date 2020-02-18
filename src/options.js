@@ -26,6 +26,7 @@ async function checkBadgeColorManualSetting () {
 }
 
 // Called by an event listener on input/select elements
+// It also tells the background page to reload settings
 async function saveOptions (event) {
   let settings = await browser.storage.local.get()
 
@@ -92,8 +93,8 @@ async function start () {
 
     // Setup handlers
     document.querySelectorAll('#settings .field input,select').forEach(elt => {
-      // TODO Preview on input (eg. live color change)
-      elt.addEventListener('input', () => {})
+      // Preview (actually, save) on input (eg. live color change)
+      elt.addEventListener('input', saveOptions)
       // Save the settings on commited change
       elt.addEventListener('change', saveOptions)
     })
