@@ -27,8 +27,6 @@ async function start () {
   document.getElementById('currentWindow').textContent = currentWindow
   document.getElementById('allTabs').textContent = allTabs
   document.getElementById('allWindows').textContent = allWindows
-
-  })
 }
 
 start()

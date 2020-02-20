@@ -6,6 +6,8 @@ A button badge that shows the number of tabs open in a window. Tested for Firefo
 
 This addon was created as a WebExtension Replacement for [Michael Kraft's Tab Counter](https://addons.mozilla.org/en-US/firefox/addon/tab-counter/).
 
+_The following are links for DaAwesomeP's downloads._
+
 | Platform | Badges |
 | :------: | :----- |
 | **Firefox** | [![Mozilla Add-on][firefox badge]][AMO] [![Mozilla Add-on][amo version badge]][AMO] |
@@ -14,8 +16,8 @@ This addon was created as a WebExtension Replacement for [Michael Kraft's Tab Co
 | **Chrome** | *Google charges a developer fee to enlist in the Chrome Web Store. Please use the Opera WebExtension download.* |
 
 
-[travis build]: https://travis-ci.org/DaAwesomeP/tab-counter
-[build badge]: https://img.shields.io/travis/DaAwesomeP/tab-counter.svg?style=flat-square
+[travis build]: https://travis-ci.org/tqdv/tab-counter
+[build badge]: https://img.shields.io/travis/tqdv/tab-counter.svg?style=flat-square
 
 [AMO]: https://addons.mozilla.org/en-US/firefox/addon/tab-counter-webext/
 [opera addons]:  https://addons.opera.com/en/extensions/details/tab-counter-2/
@@ -25,7 +27,7 @@ This addon was created as a WebExtension Replacement for [Michael Kraft's Tab Co
 [opera badge]: https://img.shields.io/badge/opera-download-red.svg?style=flat-square&logo=opera
 [webext badge]: https://img.shields.io/badge/webextension-download-lightgrey.svg?style=flat-square&logo=github
 
-[release badge]: https://img.shields.io/github/release/DaAwesomeP/tab-counter.svg?style=flat-square
+[release badge]: https://img.shields.io/github/release/tqdv/tab-counter.svg?style=flat-square
 [amo version badge]: https://img.shields.io/amo/v/tab-counter-webext.svg?style=flat-square
 
 ## Development

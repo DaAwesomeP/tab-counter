@@ -23,7 +23,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "tab-counter@daawesomep.addons.mozilla.org",
+      "id": "tab-counter@tqdv.addons.mozilla.org",
       "strict_min_version": "52.0"
     }
   },
