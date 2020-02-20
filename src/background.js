@@ -162,6 +162,40 @@ const refreshSettings = async function refreshSettings () {
   browser.storage.local.set(settings)
 }
 
+// The following two function (addListeners and removeListeners) are
+// only used in loadSettings but are taken out because they take too much space
+
+/** Add tab and window listeners to update the counter */
+const addListeners = function addListeners () {
+  browser.tabs.onActivated.addListener(forceUpdate)
+  browser.tabs.onAttached.addListener(update)
+  browser.tabs.onCreated.addListener(update)
+  browser.tabs.onDetached.addListener(update)
+  browser.tabs.onMoved.addListener(update)
+  browser.tabs.onReplaced.addListener(update)
+  browser.tabs.onRemoved.addListener(lateUpdate)
+  browser.tabs.onUpdated.addListener(update) // NB: Maybe useful for hidden ?
+  browser.windows.onCreated.addListener(update)
+  browser.windows.onRemoved.addListener(update)
+  browser.windows.onFocusChanged.addListener(update)
+}
+
+/** Remove tab and window listeners added in addListeners */
+const removeListeners = function removeListeners () {
+  // remove the listeners that were added
+  browser.tabs.onActivated.removeListener(forceUpdate)
+  browser.tabs.onAttached.removeListener(update)
+  browser.tabs.onCreated.removeListener(update)
+  browser.tabs.onDetached.removeListener(update)
+  browser.tabs.onMoved.removeListener(update)
+  browser.tabs.onReplaced.removeListener(update)
+  browser.tabs.onRemoved.removeListener(lateUpdate)
+  browser.tabs.onUpdated.removeListener(update)
+  browser.windows.onCreated.removeListener(update)
+  browser.windows.onRemoved.removeListener(update)
+  browser.windows.onFocusChanged.removeListener(update)
+}
+
 // Load and apply icon and badge color settings
 const loadSettings = async function loadSettings () {
   // Get settings object
@@ -185,30 +219,10 @@ const loadSettings = async function loadSettings () {
 
   // Either add badge update events or don't if not set to
   if (settings.counter !== 'none') {
-    browser.tabs.onActivated.addListener(forceUpdate)
-    browser.tabs.onAttached.addListener(update)
-    browser.tabs.onCreated.addListener(update)
-    browser.tabs.onDetached.addListener(update)
-    browser.tabs.onMoved.addListener(update)
-    browser.tabs.onReplaced.addListener(update)
-    browser.tabs.onRemoved.addListener(lateUpdate)
-    browser.tabs.onUpdated.addListener(update) // NB: Maybe useful for hidden ?
-    browser.windows.onCreated.addListener(update)
-    browser.windows.onRemoved.addListener(update)
-    browser.windows.onFocusChanged.addListener(update)
+    addListeners()
   } else {
     // remove the listeners that were added
-    browser.tabs.onActivated.removeListener(forceUpdate)
-    browser.tabs.onAttached.removeListener(update)
-    browser.tabs.onCreated.removeListener(update)
-    browser.tabs.onDetached.removeListener(update)
-    browser.tabs.onMoved.removeListener(update)
-    browser.tabs.onReplaced.removeListener(update)
-    browser.tabs.onRemoved.removeListener(lateUpdate)
-    browser.tabs.onUpdated.removeListener(update)
-    browser.windows.onCreated.removeListener(update)
-    browser.windows.onRemoved.removeListener(update)
-    browser.windows.onFocusChanged.removeListener(update)
+    removeListeners()
 
     // hide the "wait" badge if set not to show a badge
     browser.browserAction.setBadgeText({ text: '' })
@@ -229,17 +243,15 @@ const loadSettings = async function loadSettings () {
   }
 }
 
-/* Message handlers */
 // Listen for internal addon messages
-const messageHandler = async function messageHandler (request, sender, sendResponse) {
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // Check for a settings update
   if (request.updateSettings) {
     loadSettings()
       .then(forceUpdate)
   }
-}
+})
 
-browser.runtime.onMessage.addListener(messageHandler)
 /* Installs and upgrades */
 browser.runtime.onInstalled.addListener(async ({ reason, temporary }) => {
   if (temporary) return // skip during development
@@ -255,11 +267,15 @@ browser.runtime.onInstalled.addListener(async ({ reason, temporary }) => {
 
 // Init badge for when addon starts and not yet loaded tabs
 // NB: loading color is black, setting default is grey
-browser.browserAction.setBadgeText({ text: '...' })
+browser.browserAction.setBadgeText({ text: 'wait' })
 browser.browserAction.setBadgeBackgroundColor({ color: '#000' })
 
 refreshSettings()
   // Wait two seconds before starting listeners to let the browser restore tabs, etc…
   .then((resolve, reject) => { setTimeout(resolve, 2000) })
+  .then(() => {
+    // Set the global browser badge to empty to be less noticable
+    browser.browserAction.setBadgeText({text: ' '})
+  })
   .then(loadSettings)
   .then(update)
