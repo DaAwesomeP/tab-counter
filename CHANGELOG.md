@@ -6,8 +6,15 @@ and this project **does not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+This probably also fixes a syntax error for the last two versions.
+
+### User side
+
+* Revert to "wait" badge text at start, and a single space otherwise to be less noticable
+
 ### Developer side
 
+* Update some README badges
 * Add changelog
 
 ## v0.5.1 — 2020-02-18

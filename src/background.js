@@ -132,10 +132,10 @@ const upgradeSettings = async function upgradeSettings (settings) {
 }
 
 // Assign default value to settings if they don't exist **excluding version**
-const makeDefaultSettings = function makeDefaultSettings (settings) {
+const makeDefaultSettings = async function makeDefaultSettings (settings) {
   const defaults = {
     badgeColor: '#999',
-    badgeTextColorAuto: true,
+    badgeTextColorAuto: await isBadgeTextColorAvailable(),
     badgeTextColor: '#000',
     icon: 'tabcounter.plain.min.svg',
     counter: 'currentWindow'
@@ -158,8 +158,8 @@ const refreshSettings = async function refreshSettings () {
   }
 
   // Add in defaults and save
-  settings = makeDefaultSettings(settings)
-  browser.storage.local.set(settings)
+  settings = await makeDefaultSettings(settings)
+  await browser.storage.local.set(settings)
 }
 
 // The following two function (addListeners and removeListeners) are
@@ -272,7 +272,9 @@ browser.browserAction.setBadgeBackgroundColor({ color: '#000' })
 
 refreshSettings()
   // Wait two seconds before starting listeners to let the browser restore tabs, etc…
-  .then((resolve, reject) => { setTimeout(resolve, 2000) })
+  .then(() => new Promise((resolve, reject) => {
+    setTimeout(resolve, 2000)
+  }))
   .then(() => {
     // Set the global browser badge to empty to be less noticable
     browser.browserAction.setBadgeText({text: ' '})

@@ -21,7 +21,7 @@ _The following are links for DaAwesomeP's downloads._
 
 [AMO]: https://addons.mozilla.org/en-US/firefox/addon/tab-counter-webext/
 [opera addons]:  https://addons.opera.com/en/extensions/details/tab-counter-2/
-[gh latest]: https://github.com/DaAwesomeP/tab-counter/releases/latest
+[gh latest]: https://github.com/tqdv/tab-counter/releases/latest
 
 [firefox badge]: https://img.shields.io/badge/firefox-download-orange.svg?style=flat-square&logo=mozilla-firefox
 [opera badge]: https://img.shields.io/badge/opera-download-red.svg?style=flat-square&logo=opera
@@ -45,6 +45,10 @@ npm run watch
 
 # check package.json and gulpfile.js for more commands
 ```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md)
 
 ## License
 [Apache 2.0](https://github.com/DaAwesomeP/tab-counter/blob/master/LICENSE)

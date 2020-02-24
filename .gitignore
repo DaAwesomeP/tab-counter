@@ -1,6 +1,11 @@
 .tmp
-build
-dist
+
+# Builds
+/build
+/dist
+# TODO remove it here and in the gulpfile
+/dev
+web-ext-artifacts/
 
 logs
 *.log
@@ -51,6 +56,3 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
-
-# Development builds
-/dev
