@@ -1,3 +1,10 @@
+// This needs to be included first as it exports `browser` globally
+
+import browser from 'webextension-polyfill'
+
+// Make it available in other scripts
+window.browser = browser
+
 // setBadgeTextColor is available in Firefox >= 63
 // The result can be easily cached if it needs to be
 async function isBadgeTextColorAvailable () {

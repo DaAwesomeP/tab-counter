@@ -18,8 +18,6 @@
  * limitations under the License.
  */
 
-import browser from 'webextension-polyfill'
-
 async function start () {
   let currentWindow = (await browser.tabs.query({ currentWindow: true })).length
   let allTabs = (await browser.tabs.query({})).length
