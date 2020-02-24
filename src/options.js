@@ -18,8 +18,6 @@
  * limitations under the License.
  */
 
-import browser from 'webextension-polyfill'
-
 async function checkBadgeColorManualSetting () {
   let autoSelect = document.getElementById('badgeTextColorAuto').checked
   document.getElementById('badgeTextColor').disabled = autoSelect
@@ -74,12 +72,19 @@ function insertVersion () {
   document.getElementById('settings').append(p)
 }
 
-// Badge Test color is only available in Firefox
+// Badge Text color is only available in Firefox
 // So remove those options when it's not available
 async function removeTextColorInNotFirefox () {
   if (!(await isBadgeTextColorAvailable())) {
     document.getElementById('badgeTextColorAuto').closest('.option').remove()
     document.getElementById('badgeTextColor').closest('.option').remove()
+  }
+}
+
+// Hiding tabs is an experimental Firefox feature, so hide it when not available
+async function removeHiddenInPopupInNotFirefox () {
+  if (!(await isHidingTabsAvailable())) {
+    document.getElementById('hiddenInPopup').closest('.option').remove()
   }
 }
 
@@ -105,10 +110,11 @@ async function start () {
         document.getElementById('badgeTextColor').disabled = e.target.checked
       })
 
-    // Disable badge text color options in not Firefox browsers
+    // Hide options unsupported by the current browser
     let removeTextColorP = removeTextColorInNotFirefox()
+    let removeHiddenInPopupP = removeHiddenInPopupInNotFirefox()
 
-    return Promise.all([removeTextColorP])
+    return Promise.all([removeTextColorP, removeHiddenInPopupP])
   }
 
   await setup()

@@ -146,7 +146,8 @@ const makeDefaultSettings = async function makeDefaultSettings (settings) {
     badgeTextColorAuto: await isBadgeTextColorAvailable(),
     badgeTextColor: '#000',
     icon: 'tabcounter.plain.min.svg',
-    counter: 'currentWindow'
+    counter: 'currentWindow',
+    hiddenInPopup: false
   }
 
   return Object.assign(defaults, settings)

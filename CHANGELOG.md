@@ -14,7 +14,7 @@ Ignore hidden tabs. This probably also fixes a syntax error for the last two ver
 
 ### User side
 
-* Do not count hidden tabs
+* Do not count hidden tabs and add an option to hide them in popup
 * Revert to "wait" badge text at start, and a single space otherwise to be less noticeable
 
 ### Developer side

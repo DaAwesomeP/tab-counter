@@ -19,16 +19,48 @@
  */
 
 async function start () {
+  const settings = await browser.storage.local.get()
+
   // Object that is spread (expanded) into tabs.query(obj)
   const ignoreHiddenTabs = {}
   if (await isHidingTabsAvailable()) { ignoreHiddenTabs.hidden = false }
 
-  let currentWindow = (await browser.tabs.query({ currentWindow: true, ...ignoreHiddenTabs })).length
-  let allTabs = (await browser.tabs.query({ ...ignoreHiddenTabs })).length
-  let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
-  document.getElementById('currentWindow').textContent = currentWindow
-  document.getElementById('allTabs').textContent = allTabs
-  document.getElementById('allWindows').textContent = allWindows
+  // Start all Promises
+  let currentWindow = browser.tabs.query({ currentWindow: true, ...ignoreHiddenTabs })
+    .then(v => v.length.toString())
+  let allTabs = browser.tabs.query({ ...ignoreHiddenTabs })
+    .then(v => v.length.toString())
+  let allWindows = browser.windows.getAll({ populate: false, windowTypes: ['normal'] })
+    .then(v => v.length.toString())
+
+  document.getElementById('currentWindow').textContent = await currentWindow
+  document.getElementById('allTabs').textContent = await allTabs
+  document.getElementById('allWindows').textContent = await allWindows
+
+  // Display (or not) the number of hidden tabs
+  if (settings.hiddenInPopup) {
+    // ... for this window
+    browser.tabs.query({ currentWindow: true, hidden: true })
+      .then(v => v.length.toString())
+      .then(currentHidden => {
+        document.getElementById('currentHidden').hidden = false
+        document.getElementById('currentHidden').textContent =
+          (currentHidden > 0 ? `(+${currentHidden} hidden)` : '')
+      })
+
+    // ... for all windows
+    browser.tabs.query({ hidden: true })
+      .then(v => v.length.toString())
+      .then(allHidden => {
+        document.getElementById('allHidden').hidden = false
+        document.getElementById('allHidden').textContent =
+          (allHidden > 0 ? `(+${allHidden} hidden)` : '')
+      })
+
+  } else {
+    document.getElementById('currentHidden').hidden = true
+    document.getElementById('allHidden').hidden = true
+  }
 }
 
 start()
