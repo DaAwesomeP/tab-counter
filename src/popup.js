@@ -19,8 +19,12 @@
  */
 
 async function start () {
-  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length
-  let allTabs = (await browser.tabs.query({})).length
+  // Object that is spread (expanded) into tabs.query(obj)
+  const ignoreHiddenTabs = {}
+  if (await isHidingTabsAvailable()) { ignoreHiddenTabs.hidden = false }
+
+  let currentWindow = (await browser.tabs.query({ currentWindow: true, ...ignoreHiddenTabs })).length
+  let allTabs = (await browser.tabs.query({ ...ignoreHiddenTabs })).length
   let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
   document.getElementById('currentWindow').textContent = currentWindow
   document.getElementById('allTabs').textContent = allTabs

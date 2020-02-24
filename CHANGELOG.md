@@ -6,11 +6,16 @@ and this project **does not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
-This probably also fixes a syntax error for the last two versions.
+...
+
+## v0.6.0 – 2020-02-24
+
+Ignore hidden tabs. This probably also fixes a syntax error for the last two versions.
 
 ### User side
 
-* Revert to "wait" badge text at start, and a single space otherwise to be less noticable
+* Do not count hidden tabs
+* Revert to "wait" badge text at start, and a single space otherwise to be less noticeable
 
 ### Developer side
 

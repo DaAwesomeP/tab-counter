@@ -37,12 +37,21 @@ const updateIcon = async function updateIcon () {
   //   This is to handle multiple browser windows because
   //   the details.windowId parameter for browserAction.setBadgeText(details)
   //   isn't supported by chromium yet
+
+  // Object that is spread (expanded) into tabs.query(obj)
+  const ignoreHiddenTabs = {}
+  if (await isHidingTabsAvailable()) { ignoreHiddenTabs.hidden = false }
+
   // Get tabs in current window, tabs in all windows, and the number of windows as strings
   let [currentTabId, currentWindow, allTabs, nbWindows] = await Promise.all([
-    /* currentTab */ browser.tabs.query({ currentWindow: true, active: true }).then(v => v[0].id),
-    /* currentWindow */ browser.tabs.query({ currentWindow: true }).then(v => v.length.toString()),
-    /* allTabs */ browser.tabs.query({}).then(v => v.length.toString()),
-    /* nbWindows */ browser.windows.getAll({ populate: false, windowTypes: ['normal'] }).then(v => v.length.toString())
+    /* currentTab */ browser.tabs.query({ currentWindow: true, active: true })
+      .then(v => v[0].id),
+    /* currentWindow */ browser.tabs.query({ currentWindow: true, ...ignoreHiddenTabs })
+      .then(v => v.length.toString()),
+    /* allTabs */ browser.tabs.query({ ...ignoreHiddenTabs })
+      .then(v => v.length.toString()),
+    /* nbWindows */ browser.windows.getAll({ populate: false, windowTypes: ['normal'] })
+      .then(v => v.length.toString())
   ])
 
   if (typeof currentTabId !== 'undefined') {
@@ -276,7 +285,7 @@ refreshSettings()
   }))
   .then(() => {
     // Set the global browser badge to empty to be less noticable
-    browser.browserAction.setBadgeText({text: ' '})
+    browser.browserAction.setBadgeText({ text: ' ' })
   })
   .then(loadSettings)
   .then(update)
