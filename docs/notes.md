@@ -4,17 +4,16 @@ The options page takes about 20ms to load for me (tqdv)
 
 ## TODO
 
-+ Hide some icon options in opera
++ Use windowId
++ Build process for icons
 
-* Build process for icons
++ Hide some icon options in opera
 * Ignore pinned tabs (false by default, show in tooltip and popup when enabled)
 * TODO fix icons in Chrome
-* Make use of web-ext and gulp better
 * badge color should match firefox theme
 * svg icon
 * handle large numbers
 * Test with Opera.
-* Use windowId.
 
 inspiration:
 * https://github.com/DaAwesomeP/tab-counter/issues?utf8=%E2%9C%93&q=is%3Aissue

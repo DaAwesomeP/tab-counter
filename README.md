@@ -1,10 +1,11 @@
 tab-counter [![Travis][build badge]][travis build] [![GitHub release][release badge]][gh latest]
 ===========
 
-
 A button badge that shows the number of tabs open in a window. Tested for Firefox and Opera.
 
 This addon is forked from DaAwesomeP who created it as a WebExtension Replacement for [Michael Kraft's Tab Counter](https://addons.mozilla.org/en-US/firefox/addon/tab-counter/).
+
+## Download
 
 | Platform | Badges |
 | :------: | :----- |
@@ -27,6 +28,12 @@ This addon is forked from DaAwesomeP who created it as a WebExtension Replacemen
 
 [release badge]: https://img.shields.io/github/release/tqdv/tab-counter.svg?style=flat-square
 [amo version badge]: https://img.shields.io/amo/v/tab-counter-webext.svg?style=flat-square
+
+## Screenshots
+
+![Tab counter in a Firefox window](docs/img/badge_in_window_0.6.0.png)
+
+![Tab counter popup](docs/img/0.6.0_popup_info.png) ![Multiple windows and colors](docs/img/0.6.0_color_and_windows.png)
 
 ## Building
 
