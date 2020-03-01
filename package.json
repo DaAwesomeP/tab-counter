@@ -33,10 +33,10 @@
     "gulp": "gulp",
     "build": "gulp build",
     "dist": "gulp dist",
-    "check": "gulp check",
+    "all": "gulp all",
     "clean": "gulp clean",
-    "pack": "gulp pack",
-    "watch": "gulp watch"
+    "watch": "gulp watch",
+    "run": "web-ext run -s build/"
   },
   "repository": {
     "url": "https://github.com/DaAwesomeP/tab-counter"

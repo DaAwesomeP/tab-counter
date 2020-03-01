@@ -4,9 +4,7 @@ tab-counter [![Travis][build badge]][travis build] [![GitHub release][release ba
 
 A button badge that shows the number of tabs open in a window. Tested for Firefox and Opera.
 
-This addon was created as a WebExtension Replacement for [Michael Kraft's Tab Counter](https://addons.mozilla.org/en-US/firefox/addon/tab-counter/).
-
-_The following are links for DaAwesomeP's downloads._
+This addon is forked from DaAwesomeP who created it as a WebExtension Replacement for [Michael Kraft's Tab Counter](https://addons.mozilla.org/en-US/firefox/addon/tab-counter/).
 
 | Platform | Badges |
 | :------: | :----- |
@@ -30,25 +28,47 @@ _The following are links for DaAwesomeP's downloads._
 [release badge]: https://img.shields.io/github/release/tqdv/tab-counter.svg?style=flat-square
 [amo version badge]: https://img.shields.io/amo/v/tab-counter-webext.svg?style=flat-square
 
+## Building
+
+Install NodeJS and NPM.
+
+```bash
+npm i
+npm run dist
+# or `npm run all` if you want to build for Firefox and Opera
+```
+
 ## Development
 
-You will need NodeJS v7 or higher with the NPM v4 or higher.
+You will need a recent NodeJS and NPM.
+
 ```bash
 # install dependencies
 npm i
 
-# build extension (makes ZIP archives in build/)
+# build extension (compiles the source code into build/)
 npm run build
 
-# watch for changes and build dist/ (temporarily rename a manifest to load unpacked)
+# Prepare for distribution (creates a zip in dist/)
+npm run dist
+npm run all # Create archives for both Opera and Firefox
+
+# watch for changes and rebuild
 npm run watch
+
+# Run the extension in Firefox and reload on change
+npm run run
 
 # check package.json and gulpfile.js for more commands
 ```
+
+Ressources:
+* [Index of files](docs/files.md)
+* [Development notes](docs/notes.md)
 
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md)
 
 ## License
-[Apache 2.0](https://github.com/DaAwesomeP/tab-counter/blob/master/LICENSE)
+[Apache 2.0](LICENSE)

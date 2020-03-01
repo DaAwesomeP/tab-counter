@@ -95,17 +95,18 @@ function compileManifest (view) {
     .pipe(gulp.dest('build'))
 }
 compileManifest.description = 'Run the manifest through Mustache'
-exports.compileManifest = compileManifest
 
 const compileFirefoxManifest = () => compileManifest({ firefox: true })
+exports.compileFirefoxManifest = compileFirefoxManifest
 const compileOperaManifest = () => compileManifest({ opera: true })
+exports.compileOperaManifest = compileOperaManifest
 
 function compileReadable () {
   return gulp.src('LICENSE', 'README.md')
     .pipe(gulp.dest('build'))
 }
 compileReadable.description = 'Compile project-related files (README, LICENSE)'
-//exports.compileReadable = compileReadable
+exports.compileReadable = compileReadable
 
 function compileFirefoxIcons () {
   return gulp.src(['icons/**/clear-*.png', 'icons/**/*.min.svg'])
@@ -121,39 +122,41 @@ function compileOperaIcons () {
 compileOperaIcons.description = 'Copy Opera icons'
 exports.compileOperaIcons = compileOperaIcons
 
-const compileFirefox = gulp.parallel(
-    compileJs,
-    compileOtherSources,
-    compileFirefoxManifest,
-    compileReadable,
-    compileFirefoxIcons
-  )
-exports.compileFirefox = compileFirefox
+function compile (view) {
+  let compileIcons;
+  if (view.firefox) compileIcons = compileFirefoxIcons
+  if (view.opera) compileIcons = compileOperaIcons
 
-const compileOpera = gulp.parallel(
+  let compileCorrectManifest = () => compileManifest(view)
+
+  return gulp.parallel(
     compileJs,
     compileOtherSources,
-    compileOperaManifest,
+    compileCorrectManifest,
     compileReadable,
-    compileFirefoxIcons
+    compileIcons
   )
+}
+
+const compileFirefox = compile({ firefox: true })
+const compileOpera = compile({ opera: true })
+
+exports.compileFirefox = compileFirefox
 exports.compileOpera = compileOpera
 
-const buildFirefox = gulp.parallel(
-  fixEOL,
-  lint,
-  gulp.series(clean, compileFirefox)
-)
+function build (view) {
+  return gulp.parallel(
+    fixEOL,
+    lint,
+    gulp.series(clean, compile(view))
+  )
+}
+
+const buildFirefox = build({ firefox : true })
+const buildOpera = build({ opera: true })
+
 buildFirefox.description = 'Cleanly build for Firefox'
 exports.buildFirefox = buildFirefox
-
-const buildOpera = gulp.series(
-  fixEOL,
-  gulp.parallel(
-    lint,
-    gulp.series(clean, compileOpera)
-  )
-)
 buildOpera.description = 'Cleanly build for Opera'
 exports.buildOpera = buildOpera
 
@@ -163,9 +166,11 @@ function pack (browser) {
     .pipe(gulp.dest('dist'))
 }
 const packFirefox = () => pack('firefox')
-packFirefox.description = 'Pack files in build/ for Firefox'
 const packOpera = () => pack('opera')
+packFirefox.description = 'Pack files in build/ for Firefox'
+exports.packFirefox = packFirefox
 packOpera.description = 'Pack files in build/ for Opera'
+exports.packOpera = packOpera
 
 const distFirefox = gulp.series(buildFirefox, packFirefox)
 const distOpera = gulp.series(buildOpera, packOpera)
@@ -177,11 +182,18 @@ exports.dist = distFirefox
 exports.all = gulp.series(distFirefox, distOpera)
 exports.default = exports.build
 
-function watch () {
-  gulp.watch(
-    ['src/**/*', 'icons/**/*', 'manifest.json.mustache'],
-    gulp.parallel(buildFirefox)
-  )
-}
+// Don't add fixEOL to this task as it triggers an infinite loop, I think
+const watchTask = gulp.series(
+  clean,
+  compile({ firefox: true }),
+  function rebuildingHasFinished (done) { done() }
+)
+
+let watch = gulp.series(
+  watchTask,
+  function innerWatch () {
+    return gulp.watch(['src/**/*', 'icons/**/*', 'manifest.json.mustache'], watchTask)
+  }
+)
 watch.description = 'Watch source files for changes and rebuild'
 exports.watch = watch
