@@ -14,11 +14,15 @@ Ignore hidden tabs. This probably also fixes a syntax error for the last two ver
 
 ### User side
 
-* Do not count hidden tabs and add an option to hide them in popup
+* Do not count hidden tabs
+  * Add an option to display them in popup
+  * Add an option to count them anyways
 * Revert to "wait" badge text at start, and a single space otherwise to be less noticeable
 
 ### Developer side
 
+* Add WIP documentation
+* Rework gulp tasks and npm scripts
 * Update some README badges
 * Add changelog
 

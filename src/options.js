@@ -18,9 +18,18 @@
  * limitations under the License.
  */
 
-async function checkBadgeColorManualSetting () {
-  let autoSelect = document.getElementById('badgeTextColorAuto').checked
-  document.getElementById('badgeTextColor').disabled = autoSelect
+// Checking "Automatically set badge text color" disables the "Badge text color" option
+async function checkBadgeTextColorManualSetting () {
+  const automaticTextColor = document.getElementById('badgeTextColorAuto').checked
+  const inputElt = document.getElementById('badgeTextColor')
+  const optionElt = inputElt.closest('.option')
+
+  inputElt.disabled = automaticTextColor
+  if (automaticTextColor) {
+    optionElt.classList.add('disabled')
+  } else {
+    optionElt.classList.remove('disabled')
+  }
 }
 
 // Called by an event listener on input/select elements
@@ -48,7 +57,7 @@ async function restoreOptions () {
     }
   }
 
-  checkBadgeColorManualSetting()
+  checkBadgeTextColorManualSetting()
 }
 
 // Add a version line at the end of settings form
@@ -76,15 +85,14 @@ function insertVersion () {
 // So remove those options when it's not available
 async function removeTextColorInNotFirefox () {
   if (!(await isBadgeTextColorAvailable())) {
-    document.getElementById('badgeTextColorAuto').closest('.option').remove()
-    document.getElementById('badgeTextColor').closest('.option').remove()
+    document.getElementById('badge-text-color-options').remove()
   }
 }
 
 // Hiding tabs is an experimental Firefox feature, so hide it when not available
 async function removeHiddenInPopupInNotFirefox () {
   if (!(await isHidingTabsAvailable())) {
-    document.getElementById('hiddenInPopup').closest('.option').remove()
+    document.getElementById('hidden-tabs-options').remove()
   }
 }
 
@@ -106,9 +114,7 @@ async function start () {
 
     // Enable/Disable Text color option depending on if we set it automatically
     document.getElementById('badgeTextColorAuto')
-      .addEventListener('input', e => {
-        document.getElementById('badgeTextColor').disabled = e.target.checked
-      })
+      .addEventListener('input', checkBadgeTextColorManualSetting)
 
     // Hide options unsupported by the current browser
     let removeTextColorP = removeTextColorInNotFirefox()

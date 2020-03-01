@@ -54,77 +54,104 @@
       .option.disabled {
         color: grey;
       }
+
+      .option-header {
+        margin: 0;
+        font-size: 12pt;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
     <form id="settings">
-      <p>Unfortunately, the browser predetermines the font size of the badge.</p>
-      <div class="option">
-        <div class="label">
-          <label for="badgeColor">Badge color</label>
+      <section id="icon-options">
+        <h3 class="option-header">Icon</h3>
+        <div class="option">
+          <div class="label">
+            <label>Icon color &amp; style</label>
+          </div>
+          <div class="field">
+            <select name="icon" id="icon">
+              <option value="tabcounter.plain.min.svg">Tab Counter Default</option>
+              <option value="tabcounter-gray90.plain.min.svg">Tab Counter Gray 90 (Firefox Photon Design System Light Background Icon Color)</option>
+              <option value="tabcounter-gray10.plain.min.svg">Tab Counter Gray 10 (Firefox Photon Design System Dark Background Icon Color)</option>
+              <option value="tabcounter-black.plain.min.svg">Tab Counter Black</option>
+              <option value="tabcounter-white.plain.min.svg">Tab Counter White</option>
+              <option value="clear.plain.min.svg">Clear SVG for Firefox (shows badge only)</option>
+              <option value="clear-1.png">Clear 1px PNG for Opera (shows badge only)</option>
+            </select>
+          </div>
         </div>
-        <div class="field">
-          <input type="color" name="badgeColor" id="badgeColor" class="field" />
+      </section>
+      <section id="badge-options">
+        <h3 class="option-header">Badge</h3>
+        <div class="option">
+          <div class="label">
+            <label>Counter value</label>
+          </div>
+          <div class="field">
+            <select name="counter" id="counter">
+              <option value="currentWindow">Number of Tabs in Current Window</option>
+              <option value="allWindows">Total Number of Tabs of All Windows</option>
+              <option value="windowAndAll">Both Number of Tabs in Current Window/Total Number of Tabs of All Windows</option>
+              <option value="nbWindows">Total Number of Windows</option>
+              <option value="none">None (disables the counter and hover text; click the icon to see the count)</option>
+            </select>
+            <span class="description">A maximum of four characters can be displayed on the badge. This is a browser limitation.</span>
+          </div>
         </div>
-      </div>
-      <div class="option">
-        <div class="label">
-          <label for="badgeTextColorAuto">Automatically set badge text color</label>
+        <div class="option">
+          <div class="label">
+            <label for="badgeColor">Badge color</label>
+          </div>
+          <div class="field">
+            <input type="color" name="badgeColor" id="badgeColor" class="field" />
+          </div>
         </div>
-        <div class="field">
-          <input type="checkbox" name="badgeTextColorAuto" id="badgeTextColorAuto" />
-          <span class="description">When checked, the text color is either white or black based on the highest constrast with the badge color.</span>
+      </section>
+      <section id="badge-text-color-options">
+        <h3 class="option-header">Badge text color</h3>
+        <div class="option">
+          <div class="label">
+            <label for="badgeTextColorAuto">Automatically set badge text color</label>
+          </div>
+          <div class="field">
+            <input type="checkbox" name="badgeTextColorAuto" id="badgeTextColorAuto" />
+            <span class="description">When checked, the text color is either white or black based on the highest constrast with the badge color.</span>
+          </div>
         </div>
-      </div>
-      <div class="option">
-        <div class="label">
-          <label for="badgeTextColor">Badge text color</label>
+        <div class="option">
+          <div class="label">
+            <label for="badgeTextColor">Badge text color</label>
+          </div>
+          <div class="field">
+            <input type="color" name="badgeTextColor" id="badgeTextColor" />
+            <span class="description">Setting the badge text color is available in Firefox 63 and above.</span>
+          </div>
         </div>
-        <div class="field">
-          <input type="color" name="badgeTextColor" id="badgeTextColor" />
-          <span class="description">Setting the badge text color is available in Firefox 63 and above.</span>
+      </section>
+      <section id="hidden-tabs-options">
+        <h3 class="option-header">Hidden tabs</h3>
+        <p>Hidden tabs is an experimental Firefox feature used by extensions such as Panorama view</p>
+        <div class="option">
+          <div class="label">
+            <label for="includeHidden">Include hidden tabs in the counter</label>
+          </div>
+          <div class="field">
+            <input type="checkbox" name="includeHidden" id="includeHidden"></input>
+            <span class="description">Choose whether to also count hidden tabs in the badge text.</span>
+          </div>
         </div>
-      </div>
-      <div class="option">
-        <div class="label">
-          <label>Icon color &amp; style</label>
+        <div class="option">
+          <div class="label">
+            <label for="hiddenInPopup">Display hidden tabs in popup</label>
+          </div>
+          <div class="field">
+            <input type="checkbox" name="hiddenInPopup" id="hiddenInPopup"></input>
+            <span class="description">Choose whether to display the number of tabs hidden in the popup.</span>
+          </div>
         </div>
-        <div class="field">
-          <select name="icon" id="icon">
-            <option value="tabcounter.plain.min.svg">Tab Counter Default</option>
-            <option value="tabcounter-gray90.plain.min.svg">Tab Counter Gray 90 (Firefox Photon Design System Light Background Icon Color)</option>
-            <option value="tabcounter-gray10.plain.min.svg">Tab Counter Gray 10 (Firefox Photon Design System Dark Background Icon Color)</option>
-            <option value="tabcounter-black.plain.min.svg">Tab Counter Black</option>
-            <option value="tabcounter-white.plain.min.svg">Tab Counter White</option>
-            <option value="clear.plain.min.svg">Clear SVG for Firefox (shows badge only)</option>
-            <option value="clear-1.png">Clear 1px PNG for Opera (shows badge only)</option>
-          </select>
-        </div>
-      </div>
-      <div class="option">
-        <div class="label">
-          <label>Counter value</label>
-        </div>
-        <div class="field">
-          <select name="counter" id="counter">
-            <option value="currentWindow">Number of Tabs in Current Window</option>
-            <option value="allWindows">Total Number of Tabs of All Windows</option>
-            <option value="windowAndAll">Both Number of Tabs in Current Window/Total Number of Tabs of All Windows</option>
-            <option value="nbWindows">Total Number of Windows</option>
-            <option value="none">None (disables the counter and hover text; click the icon to see the count)</option>
-          </select>
-          <span class="description">A maximum of four characters can be displayed on the badge; this is a browser limitation.</span>
-        </div>
-      </div>
-      <div class="option">
-        <div class="label">
-          <label for="hiddenInPopup">Display hidden tabs in popup</label>
-        </div>
-        <div class="field">
-          <input type="checkbox" name="hiddenInPopup" id="hiddenInPopup"></input>
-          <span class="description">Choose whether to display the number of tabs hidden by extensions such as Panorama view.</span>
-        </div>
-      </div>
+      </section>
     </form>
     <script type="text/javascript" src="utils.js"></script>
     <script type="text/javascript" src="options.js"></script>

@@ -40,7 +40,7 @@ const updateIcon = async function updateIcon () {
 
   // Object that is spread (expanded) into tabs.query(obj)
   const ignoreHiddenTabs = {}
-  if (await isHidingTabsAvailable()) { ignoreHiddenTabs.hidden = false }
+  if (await isHidingTabsAvailable() && !settings.includeHidden) { ignoreHiddenTabs.hidden = false }
 
   // Get tabs in current window, tabs in all windows, and the number of windows as strings
   let [currentTabId, currentWindow, allTabs, nbWindows] = await Promise.all([
@@ -142,11 +142,12 @@ const upgradeSettings = async function upgradeSettings (settings) {
 // Assign default value to settings if they don't exist **excluding version**
 const makeDefaultSettings = async function makeDefaultSettings (settings) {
   const defaults = {
+    icon: 'tabcounter.plain.min.svg',
+    counter: 'currentWindow',
     badgeColor: '#999',
     badgeTextColorAuto: await isBadgeTextColorAvailable(),
     badgeTextColor: '#000',
-    icon: 'tabcounter.plain.min.svg',
-    counter: 'currentWindow',
+    includeHidden: false,
     hiddenInPopup: false
   }
 

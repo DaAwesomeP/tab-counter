@@ -15,9 +15,8 @@ Every entry is tagged with what kind of file it is.
 `src`: Source code\
 `vcs`: Version control system (eg. git)
 
-* build/ : `artifacts`
-* dev/ : `artifacts`
-* dist/ : `artifacts`
+* build/ : `artifacts` Build folder that can be loaded unpacked in Firefox
+* dist/ : `artifacts` Packed zip archives (unsigned)
 * docs/ : `docs`
   * code.md : General description of the code architecture
   * files.md : *Current file* Description of all files
