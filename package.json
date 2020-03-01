@@ -20,6 +20,7 @@
     "gulp-cli": "^2.2.0",
     "gulp-eslint": "^5.0.0",
     "gulp-line-ending-corrector": "^1.0.3",
+    "gulp-mustache": "^4.1.2",
     "gulp-rename": "1.4.*",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-zip": "4.2.*",

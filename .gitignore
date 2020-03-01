@@ -3,8 +3,6 @@
 # Builds
 /build
 /dist
-# TODO remove it here and in the gulpfile
-/dev
 web-ext-artifacts/
 
 logs

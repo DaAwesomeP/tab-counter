@@ -18,32 +18,40 @@
  * limitations under the License.
  */
 
-const gulp = require('gulp')
-const del = require('del')
-const lec = require('gulp-line-ending-corrector')
-const bro = require('gulp-bro')
-const babelify = require('babelify')
-const eslint = require('gulp-eslint')
-const rename = require('gulp-rename')
+ // See gulp --tasks for a better overview
+
+/* eslint-disable no-multi-spaces */
+const gulp       = require('gulp')
+const del        = require('del')
+const lec        = require('gulp-line-ending-corrector')
+const bro        = require('gulp-bro')
+const babelify   = require('babelify')
+const eslint     = require('gulp-eslint')
+const rename     = require('gulp-rename')
 const sourcemaps = require('gulp-sourcemaps')
-const zip = require('gulp-zip')
+const zip        = require('gulp-zip')
+const mustache   = require('gulp-mustache')
+/* eslint-enable no-multi-spaces */
+
+// Gulp globs
+const jsFiles = ['src/**/*.js', 'gulpfile.js']
 
 function lint () {
-  return gulp.src(['src/**/*.js', 'gulpfile.js'])
+  return gulp.src(jsFiles)
+    .pipe(eslint())
+    .pipe(eslint.format())
+}
+lint.description = 'Run eslint'
+exports.lint = lint
+
+function lintError () {
+  return gulp.src(jsFiles)
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError())
 }
-lint.description = 'Run eslint and fail on error'
-exports.lint = lint
-
-function lintInfo () {
-  return gulp.src(['src/**/*.js', 'gulpfile.js'])
-    .pipe(eslint())
-    .pipe(eslint.format())
-}
-lintInfo.description = 'Run eslint'
-exports.lintInfo = lintInfo
+lintError.description = 'Run eslint and fail on error'
+exports.lintError = lintError
 
 function fixEOL () {
   return gulp.src('src/**/*.js')
@@ -53,116 +61,127 @@ function fixEOL () {
 fixEOL.description = 'Fix line endings'
 exports.fixEOL = fixEOL
 
-function clean (callback) {
-  del(['dist/*', 'build/*', 'dev/*'])
-    .then(() => callback())
+function clean () {
+  return del(['build/**/*'])
 }
 clean.description = 'Remove build artifacts'
 exports.clean = clean
 
-let compile = gulp.parallel(
-  function compileJs () {
-    return gulp.src('src/**/*.js')
-      .pipe(sourcemaps.init())
-      .pipe(bro({
-        transform: [
-          babelify.configure()
-        ]
-      }))
-      .pipe(sourcemaps.write('.'))
-      .pipe(gulp.dest('dist'))
-  },
-  function compileOther () {
-    return gulp.src(['src/**/*', '!src/**/*.js'])
-      .pipe(gulp.dest('dist'))
-  }
-)
-compile.description = 'Compile with babel into dist/'
-exports.compile = compile
-
-function cleanDev (callback) {
-  del('dev/*')
-    .then(() => callback())
+function compileJs () {
+  return gulp.src('src/**/*.js')
+    .pipe(sourcemaps.init())
+    .pipe(bro({
+      transform: [
+        babelify.configure()
+      ]
+    }))
+    .pipe(sourcemaps.write('.'))
+    .pipe(gulp.dest('build/dist'))
 }
+compileJs.description = 'Compile JS with browserify and babel'
+exports.compileJs = compileJs
 
-let devFirefox = gulp.parallel(
-  function compileJs () {
-    return gulp.src('src/**/*.js')
-      .pipe(sourcemaps.init())
-      .pipe(bro({
-        transform: [
-          babelify.configure()
-        ]
-      }))
-      .pipe(sourcemaps.write('.'))
-      .pipe(gulp.dest('dev/dist'))
-  },
-  function compileOther () {
-    return gulp.src(['src/**/*', '!src/**/*.js'])
-      .pipe(gulp.dest('dev/dist'))
-  },
-  function copyManifest () {
-    return gulp.src('manifest.firefox.json')
-      .pipe(rename('manifest.json'))
-      .pipe(gulp.dest('dev'))
-  },
-  function copyAssets () {
-    return gulp.src(['icons/**/clear-*.png', 'icons/**/*.min.svg'], { cwdbase: true })
-      .pipe(gulp.dest('dev'))
-  }
-)
-devFirefox.description = 'Compile files into dev for Firefox testing'
-exports.devFirefox = devFirefox
-exports.dev = gulp.series(cleanDev, devFirefox)
-exports.dev.description = 'Clean Firefox development build'
+function compileOtherSources () {
+  return gulp.src(['src/**/*', '!src/**/*.js'])
+    .pipe(gulp.dest('build/dist'))
+}
+compileOtherSources.description = 'Compile non JS source files like HTML'
+exports.compileOtherSources = compileOtherSources
 
-let devPack = gulp.series(cleanDev, devFirefox, function packFirefox () {
-  return gulp.src(['dev/**/*'])
-    .pipe(zip('tab-counter.firefox.zip'))
+function compileManifest (view) {
+  return gulp.src('manifest.json.mustache')
+    .pipe(mustache(view))
+    .pipe(rename('manifest.json'))
     .pipe(gulp.dest('build'))
-})
-devPack.description = 'Build for firefox and pack into a zip file'
-exports.devPack = devPack
+}
+compileManifest.description = 'Run the manifest through Mustache'
+exports.compileManifest = compileManifest
 
-let pack = gulp.parallel(
-  function packFirefox () {
-    return gulp.src(['dist/**/*', '!dist/**/*.map', 'node_modules/underscore/**/*', 'icons/**/clear-*.png', 'icons/**/*.min.svg', 'manifest.firefox.json', 'LICENSE'], { base: '.' })
-      .pipe(rename(path => {
-        if (path.basename === 'manifest.firefox') {
-          path.basename = 'manifest'
-        }
-      }))
-      .pipe(zip('tab-counter.firefox.zip'))
-      .pipe(gulp.dest('build'))
-  },
-  function packOpera () {
-    return gulp.src(['dist/**/*.js', 'dist/**/*.html', 'node_modules/webextension-polyfill/dist/browser-polyfill.js', 'node_modules/underscore/underscore.js', 'icons/**/*.png', 'icons/**/*.min.svg', 'manifest.opera.json', 'LICENSE'], { base: '.' })
-      .pipe(rename(path => {
-        if (path.basename === 'manifest.opera') {
-          path.basename = 'manifest'
-        }
-      }))
-      .pipe(zip('tab-counter.opera.zip'))
-      .pipe(gulp.dest('build'))
-  }
-)
-pack.description = 'Create a source archive in build/ for Firefox and Opera'
-exports.pack = pack
+const compileFirefoxManifest = () => compileManifest({ firefox: true })
+const compileOperaManifest = () => compileManifest({ opera: true })
 
-let watch = gulp.series(lintInfo, compile,
-  function watchChanges () {
-    return gulp.watch(
-      ['src/**/*', 'node_modules/webextension-polyfill/**/*', 'node_modules/underscore/**/*', 'icons/**/*', 'manifest.json', 'package.json'],
-      gulp.parallel(lintInfo, compile)
-    )
-  }
+function compileReadable () {
+  return gulp.src('LICENSE', 'README.md')
+    .pipe(gulp.dest('build'))
+}
+compileReadable.description = 'Compile project-related files (README, LICENSE)'
+//exports.compileReadable = compileReadable
+
+function compileFirefoxIcons () {
+  return gulp.src(['icons/**/clear-*.png', 'icons/**/*.min.svg'])
+    .pipe(gulp.dest('build/icons'))
+}
+compileFirefoxIcons.description = 'Copy Firefox icons'
+exports.compileFirefoxIcons = compileFirefoxIcons
+
+function compileOperaIcons () {
+  return gulp.src(['icons/**/*.png', 'icons/**/*.min.svg'])
+    .pipe(gulp.dest('build/icons'))
+}
+compileOperaIcons.description = 'Copy Opera icons'
+exports.compileOperaIcons = compileOperaIcons
+
+const compileFirefox = gulp.parallel(
+    compileJs,
+    compileOtherSources,
+    compileFirefoxManifest,
+    compileReadable,
+    compileFirefoxIcons
+  )
+exports.compileFirefox = compileFirefox
+
+const compileOpera = gulp.parallel(
+    compileJs,
+    compileOtherSources,
+    compileOperaManifest,
+    compileReadable,
+    compileFirefoxIcons
+  )
+exports.compileOpera = compileOpera
+
+const buildFirefox = gulp.parallel(
+  fixEOL,
+  lint,
+  gulp.series(clean, compileFirefox)
 )
-watch.description = 'Watch source files (and modules) for changes and rebuild'
+buildFirefox.description = 'Cleanly build for Firefox'
+exports.buildFirefox = buildFirefox
+
+const buildOpera = gulp.series(
+  fixEOL,
+  gulp.parallel(
+    lint,
+    gulp.series(clean, compileOpera)
+  )
+)
+buildOpera.description = 'Cleanly build for Opera'
+exports.buildOpera = buildOpera
+
+function pack (browser) {
+  return gulp.src(['build/**/*'])
+    .pipe(zip(`tab-counter.${browser}.zip`))
+    .pipe(gulp.dest('dist'))
+}
+const packFirefox = () => pack('firefox')
+packFirefox.description = 'Pack files in build/ for Firefox'
+const packOpera = () => pack('opera')
+packOpera.description = 'Pack files in build/ for Opera'
+
+const distFirefox = gulp.series(buildFirefox, packFirefox)
+const distOpera = gulp.series(buildOpera, packOpera)
+exports.distFirefox = distFirefox
+exports.distOpera = distOpera
+
+exports.build = buildFirefox
+exports.dist = distFirefox
+exports.all = gulp.series(distFirefox, distOpera)
+exports.default = exports.build
+
+function watch () {
+  gulp.watch(
+    ['src/**/*', 'icons/**/*', 'manifest.json.mustache'],
+    gulp.parallel(buildFirefox)
+  )
+}
+watch.description = 'Watch source files for changes and rebuild'
 exports.watch = watch
-
-let dist = gulp.series(fixEOL, lint, clean, compile)
-let build = gulp.series(dist, pack)
-
-exports.dist = dist
-exports.build = build
-exports.default = build

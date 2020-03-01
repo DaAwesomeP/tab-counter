@@ -8,7 +8,7 @@ and this project **does not** adhere to [Semantic Versioning](https://semver.org
 
 ...
 
-## v0.6.0 – 2020-02-24
+## v0.6.0 – ?
 
 Ignore hidden tabs. This probably also fixes a syntax error for the last two versions.
 
