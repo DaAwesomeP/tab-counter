@@ -24,7 +24,8 @@
     "gulp-rename": "1.4.*",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-zip": "4.2.*",
-    "regenerator-runtime": "^0.13.3"
+    "regenerator-runtime": "^0.13.3",
+    "web-ext": "^4.1.0"
   },
   "engines": {
     "node": "8.x"

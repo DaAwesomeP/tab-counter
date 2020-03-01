@@ -4,9 +4,9 @@ The options page takes about 20ms to load for me (tqdv)
 
 ## TODO
 
-+ Ignore hidden tabs (true by default, but show them in popup)
 + Hide some icon options in opera
 
+* Build process for icons
 * Ignore pinned tabs (false by default, show in tooltip and popup when enabled)
 * TODO fix icons in Chrome
 * Make use of web-ext and gulp better

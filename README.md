@@ -63,8 +63,10 @@ npm run run
 ```
 
 Ressources:
-* [Index of files](docs/files.md)
 * [Development notes](docs/notes.md)
+* [Overview of the build process](docs/build.md)
+* [Index of files](docs/files.md)
+* [Index of libraries](docs/libraries.md)
 
 ## Changelog
 
