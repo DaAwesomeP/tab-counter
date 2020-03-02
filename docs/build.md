@@ -28,6 +28,9 @@ gulp all # or `npm run all`
 
 # Load the extension in Firefox
 npm run run # or `web-ext run -s build`
+
+# Create a zip of the source code for AMO review
+gulp zip # or npm run zip
 ```
 
 ## Configuration files

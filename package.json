@@ -37,7 +37,8 @@
     "all": "gulp all",
     "clean": "gulp clean",
     "watch": "gulp watch",
-    "run": "web-ext run -s build/"
+    "run": "web-ext run -s build/",
+    "zip": "gulp zip"
   },
   "repository": {
     "url": "https://github.com/DaAwesomeP/tab-counter"

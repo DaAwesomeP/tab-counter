@@ -8,6 +8,10 @@ and this project **does not** adhere to [Semantic Versioning](https://semver.org
 
 ...
 
+## v0.6.1 – 2020-03-01
+
+Version bump to fix duplicate AMO id.
+
 ## v0.6.0 – 2020-03-01
 
 Ignore hidden tabs. This probably also fixes a syntax error for the last two versions.

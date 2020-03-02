@@ -56,7 +56,6 @@ async function start () {
         document.getElementById('allHidden').textContent =
           (allHidden > 0 ? `(+${allHidden} hidden)` : '')
       })
-
   } else {
     document.getElementById('currentHidden').hidden = true
     document.getElementById('allHidden').hidden = true

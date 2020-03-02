@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
- // See gulp --tasks for a better overview
+// See gulp --tasks for a better overview
 
 /* eslint-disable no-multi-spaces */
 const gulp       = require('gulp')
@@ -123,7 +123,7 @@ compileOperaIcons.description = 'Copy Opera icons'
 exports.compileOperaIcons = compileOperaIcons
 
 function compile (view) {
-  let compileIcons;
+  let compileIcons
   if (view.firefox) compileIcons = compileFirefoxIcons
   if (view.opera) compileIcons = compileOperaIcons
 
@@ -152,7 +152,7 @@ function build (view) {
   )
 }
 
-const buildFirefox = build({ firefox : true })
+const buildFirefox = build({ firefox: true })
 const buildOpera = build({ opera: true })
 
 buildFirefox.description = 'Cleanly build for Firefox'
@@ -197,3 +197,13 @@ let watch = gulp.series(
 )
 watch.description = 'Watch source files for changes and rebuild'
 exports.watch = watch
+
+function zipSource () {
+  return gulp.src(['**/*', '!.git/**', '!build/**', '!dist/**', '!node_modules/**', '!web-ext-artifacts/**'], { dot: true })
+    .pipe(zip('tab-counter-tilwa-fork-source.zip'))
+    .pipe(gulp.dest('dist'))
+}
+zipSource.description = 'Zip the source code for AMO code reviwe'
+exports.zipSource = zipSource
+
+exports.zip = zipSource
