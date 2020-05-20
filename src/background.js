@@ -41,6 +41,7 @@ const updateIcon = async function updateIcon () {
   let currentWindow = (await browser.tabs.query(currentWindowQuery)).length.toString()
   let allTabs = (await browser.tabs.query(allTabsQuery)).length.toString()
   let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
+  let pinnedTabs = (await browser.tabs.query({ pinned: true })).length
 
   if (typeof currentTab !== 'undefined') {
     let text
@@ -57,7 +58,7 @@ const updateIcon = async function updateIcon () {
 
     // Update the tooltip
     browser.browserAction.setTitle({
-      title: `Tab Counter\nTabs in this window:  ${currentWindow}\nTabs in all windows: ${allTabs}\nNumber of windows: ${allWindows}`,
+      title: `Tab Counter\nTabs in this window:  ${currentWindow}\nTabs in all windows: ${allTabs}\nNumber of windows: ${allWindows}\nNumber of pinned tabs: ${pinnedTabs}`,
       tabId: currentTab.id
     })
   }
