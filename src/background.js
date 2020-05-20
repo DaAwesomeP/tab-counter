@@ -34,9 +34,14 @@ const updateIcon = async function updateIcon () {
   let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
 
   // Get tabs in current window, tabs in all windows, and the number of windows
-  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length.toString()
-  let allTabs = (await browser.tabs.query({})).length.toString()
+  // Using ternary syntax to avoid issues with lexical scoping
+  let currentWindowQuery = settings.counterExcludePinnedTabs ? { currentWindow: true, pinned: false } : { currentWindow: true }
+  let allTabsQuery = settings.counterExcludePinnedTabs ? { pinned: false } : {}
+
+  let currentWindow = (await browser.tabs.query(currentWindowQuery)).length.toString()
+  let allTabs = (await browser.tabs.query(allTabsQuery)).length.toString()
   let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
+  let pinnedTabs = (await browser.tabs.query({ pinned: true })).length
 
   if (typeof currentTab !== 'undefined') {
     let text
@@ -53,7 +58,7 @@ const updateIcon = async function updateIcon () {
 
     // Update the tooltip
     browser.browserAction.setTitle({
-      title: `Tab Counter\nTabs in this window:  ${currentWindow}\nTabs in all windows: ${allTabs}\nNumber of windows: ${allWindows}`,
+      title: `Tab Counter\nTabs in this window:  ${currentWindow}\nTabs in all windows: ${allTabs}\nNumber of windows: ${allWindows}\nNumber of pinned tabs: ${pinnedTabs}`,
       tabId: currentTab.id
     })
   }
@@ -130,6 +135,9 @@ const checkSettings = async function checkSettings (settingsUpdate) {
       settings.badgeTextColorAuto = true
       settings.badgeTextColor = '#000000'
     }
+
+    // Apply pinned tab preference
+    if (!settings.hasOwnProperty('counterExcludePinnedTabs')) settings.counterExcludePinnedTabs = false
   }
   browser.storage.local.set(Object.assign(settings, {
     version: browser.runtime.getManifest().version

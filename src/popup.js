@@ -19,12 +19,18 @@
  */
 
 async function start () {
-  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length
-  let allTabs = (await browser.tabs.query({})).length
+  let settings = await browser.storage.local.get()
+  let currentWindowQuery = settings.counterExcludePinnedTabs ? { currentWindow: true, pinned: false } : { currentWindow: true }
+  let allTabsQuery = settings.counterExcludePinnedTabs ? { pinned: false } : {}
+
+  let currentWindow = (await browser.tabs.query(currentWindowQuery)).length
+  let allTabs = (await browser.tabs.query(allTabsQuery)).length
   let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
+  let pinnedTabs = (await browser.tabs.query({ pinned: true })).length
   document.getElementById('currentWindow').textContent = currentWindow
   document.getElementById('allTabs').textContent = allTabs
   document.getElementById('allWindows').textContent = allWindows
+  document.getElementById('pinnedTabs').textContent = pinnedTabs
 }
 
 if (typeof browser === 'undefined') {
