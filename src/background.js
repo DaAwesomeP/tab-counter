@@ -34,8 +34,12 @@ const updateIcon = async function updateIcon () {
   let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
 
   // Get tabs in current window, tabs in all windows, and the number of windows
-  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length.toString()
-  let allTabs = (await browser.tabs.query({})).length.toString()
+  // Using ternary syntax to avoid issues with lexical scoping
+  let currentWindowQuery = settings.counterExcludePinnedTabs ? { currentWindow: true, pinned: false } : { currentWindow: true }
+  let allTabsQuery = settings.counterExcludePinnedTabs ? { pinned: false } : {}
+
+  let currentWindow = (await browser.tabs.query(currentWindowQuery)).length.toString()
+  let allTabs = (await browser.tabs.query(allTabsQuery)).length.toString()
   let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
 
   if (typeof currentTab !== 'undefined') {
@@ -130,6 +134,9 @@ const checkSettings = async function checkSettings (settingsUpdate) {
       settings.badgeTextColorAuto = true
       settings.badgeTextColor = '#000000'
     }
+
+    // Apply pinned tab preference
+    if (!settings.hasOwnProperty('counterExcludePinnedTabs')) settings.counterExcludePinnedTabs = false
   }
   browser.storage.local.set(Object.assign(settings, {
     version: browser.runtime.getManifest().version
