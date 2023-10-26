@@ -34,21 +34,23 @@ const updateIcon = async function updateIcon () {
   let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
 
   // Get tabs in current window, tabs in all windows, and the number of windows
-  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length
-  let allTabs = (await browser.tabs.query({})).length
-  let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length
+  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length.toString()
+  let allTabs = (await browser.tabs.query({})).length.toString()
+  let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
 
   if (typeof currentTab !== 'undefined') {
     let text
     if (counterPreference === 0) { // Badge shows current window
-      if (currentWindow > 999)
-        text = "1K"
+      // abbreviate if thousands of tabs open - assumes there won't be 100k+ tabs open
+      if (currentWindow.length > 3)
+        text = currentWindow.slice(0, currentWindow.length - 3) + "K"
       else
         text = currentWindow.toString()
     }
     else if (counterPreference === 1) { // Badge shows total of all windows
-      if (allTabs > 999)
-        text = "1K"
+      // abbreviate if thousands of tabs open - assumes there won't be 100k+ tabs open
+      if (allTabs.length > 3)
+         text = allTabs.slice(0, allTabs.length - 3) + "K"
       else
         text = allTabs.toString()
     }
