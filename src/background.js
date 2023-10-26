@@ -34,16 +34,26 @@ const updateIcon = async function updateIcon () {
   let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
 
   // Get tabs in current window, tabs in all windows, and the number of windows
-  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length.toString()
-  let allTabs = (await browser.tabs.query({})).length.toString()
-  let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
+  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length
+  let allTabs = (await browser.tabs.query({})).length
+  let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length
 
   if (typeof currentTab !== 'undefined') {
     let text
-    if (counterPreference === 0) text = currentWindow // Badge shows current window
-    else if (counterPreference === 1) text = allTabs // Badge shows total of all windows
-    else if (counterPreference === 2) text = `${currentWindow}/${allTabs}` // Badge shows both (Firefox limits to about 4 characters based on width)
-    else if (counterPreference === 4) text = allWindows // Badge shows total of all windows
+    if (counterPreference === 0) { // Badge shows current window
+      if (currentWindow > 999)
+        text = "1K"
+      else
+        text = currentWindow.toString()
+    }
+    else if (counterPreference === 1) { // Badge shows total of all windows
+      if (allTabs > 999)
+        text = "1K"
+      else
+        text = allTabs.toString()
+    }
+    else if (counterPreference === 2) text = `${currentWindow}/${allTabs}` // Badge shows both (Firefox limits to about 3 characters based on width)
+    else if (counterPreference === 4) text = allWindows.toString() // Badge shows total of all windows
 
     // Update the badge
     browser.browserAction.setBadgeText({
