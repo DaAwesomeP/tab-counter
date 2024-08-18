@@ -34,8 +34,8 @@ const updateIcon = async function updateIcon () {
   let currentTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0]
 
   // Get tabs in current window, tabs in all windows, and the number of windows
-  let currentWindow = (await browser.tabs.query({ currentWindow: true })).length.toString()
-  let allTabs = (await browser.tabs.query({})).length.toString()
+  let currentWindow = (await browser.tabs.query({ currentWindow: true, hidden: false })).length.toString()
+  let allTabs = (await browser.tabs.query({ hidden: false })).length.toString()
   let allWindows = (await browser.windows.getAll({ populate: false, windowTypes: ['normal'] })).length.toString()
 
   if (typeof currentTab !== 'undefined') {
